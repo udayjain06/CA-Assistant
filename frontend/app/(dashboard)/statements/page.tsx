@@ -1,7 +1,7 @@
 'use client'
 import { useState } from 'react'
 
-const API = 'http://localhost:8000'
+const API = 'process.env.NEXT_PUBLIC_API_URL!'
 
 const SAMPLE = [
   { desc:'Client payment - ABC Corp', amount:'150000', type:'income', category:'Revenue' },

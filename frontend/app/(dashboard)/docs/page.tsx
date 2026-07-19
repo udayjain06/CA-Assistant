@@ -1,7 +1,7 @@
 'use client'
 import { useState } from 'react'
 
-const API = 'http://localhost:8000'
+const API = 'process.env.NEXT_PUBLIC_API_URL!'
 
 type Doc = { id:number; name:string; type:string; text:string; extracted:any; status:'uploaded'|'analyzing'|'done' }
 

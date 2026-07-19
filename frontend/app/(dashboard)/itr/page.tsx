@@ -88,7 +88,7 @@ export default function ITRPage() {
   async function getAdvice() {
     setLoading(true)
     try {
-      const res = await fetch('http://localhost:8000/api/itr/ai-advice', {
+      const res = await fetch('process.env.NEXT_PUBLIC_API_URL!/api/itr/ai-advice', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

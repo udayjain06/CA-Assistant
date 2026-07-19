@@ -11,7 +11,7 @@ export function formatINR(amount: number): string {
   }).format(amount)
 }
 
-export const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
+export const API_URL = process.env.NEXT_PUBLIC_API_URL || 'process.env.NEXT_PUBLIC_API_URL!'
 
 export async function apiPost<T>(path: string, body: object): Promise<T> {
   const res = await fetch(`${API_URL}${path}`, {

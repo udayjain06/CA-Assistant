@@ -19,7 +19,7 @@ const nextConfig: NextConfig = {
               "style-src 'self' 'unsafe-inline'",
               "img-src 'self' data: https:",
               "font-src 'self'",
-              `connect-src 'self' ${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'} https://*.supabase.co`,
+              `connect-src 'self' ${process.env.NEXT_PUBLIC_API_URL || 'process.env.NEXT_PUBLIC_API_URL!'} https://*.supabase.co`,
             ].join('; ')
           },
         ],

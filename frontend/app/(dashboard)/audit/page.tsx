@@ -1,7 +1,7 @@
 'use client'
 import { useState } from 'react'
 
-const API = 'http://localhost:8000'
+const API = 'process.env.NEXT_PUBLIC_API_URL!'
 
 const COMPLIANCE_CHECKS = [
   { id:'itr', label:'ITR filed for AY 2025-26?', category:'Income Tax' },

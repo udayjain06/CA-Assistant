@@ -1,7 +1,7 @@
 'use client'
 import { useState, useRef, useEffect } from 'react'
 
-const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
+const API = process.env.NEXT_PUBLIC_API_URL || 'process.env.NEXT_PUBLIC_API_URL!'
 
 // ── Tax calc (client side) ────────────────────────────────────────────────────
 function calcTax(income: number, regime: 'new' | 'old', ded: Record<string, number>) {

@@ -12,7 +12,7 @@ const SUGGESTIONS = [
   'TDS kab katna chahiye?',
 ]
 
-const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
+const API = process.env.NEXT_PUBLIC_API_URL || 'process.env.NEXT_PUBLIC_API_URL!'
 
 export default function AdvisorPage() {
   const [messages, setMessages] = useState<Message[]>([{
