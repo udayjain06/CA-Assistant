@@ -48,7 +48,7 @@ npm run dev
 ```
 
 App runs at http://localhost:3000
-API runs at http://localhost:8000
+API runs at process.env.NEXT_PUBLIC_API_URL!
 
 ---
 
