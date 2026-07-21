@@ -5,33 +5,39 @@ import { getDashboardStats } from '@/lib/supabase/actions'
 const inr = (n: number) => '₹' + Math.round(n).toLocaleString('en-IN')
 
 const ALL_DEADLINES = [
-  { icon:'📋', name:'ITR-1 filing (AY 2025–26)', due:'31 July 2026', badge:'Urgent', badgeColor:'#EF4444', badgeBg:'#1a0505' },
-  { icon:'🧾', name:'GSTR-3B (June 2026)',        due:'20 July 2026', badge:'Soon',   badgeColor:'#F59E0B', badgeBg:'#1f1500' },
-  { icon:'📊', name:'TDS return Q1 (26Q)',         due:'31 July 2026', badge:'Soon',   badgeColor:'#F59E0B', badgeBg:'#1f1500' },
-  { icon:'🏢', name:'MCA Annual return (MGT-7)',  due:'29 Nov 2026',  badge:'Later',  badgeColor:'#4F6EF7', badgeBg:'#0d1433' },
+  { icon:'📋', name:'ITR-1 filing (AY 2025–26)', due:'31 July 2026', badge:'Urgent', bc:'#EF4444', bb:'#1a0505' },
+  { icon:'🧾', name:'GSTR-3B (June 2026)',        due:'20 July 2026', badge:'Soon',   bc:'#F59E0B', bb:'#1f1500' },
+  { icon:'📊', name:'TDS return Q1 (26Q)',         due:'31 July 2026', badge:'Soon',   bc:'#F59E0B', bb:'#1f1500' },
+  { icon:'🏢', name:'MCA Annual return (MGT-7)',  due:'29 Nov 2026',  badge:'Later',  bc:'#4F6EF7', bb:'#0d1433' },
 ]
 
 const MODULES = [
-  { href:'/ca-session',    emoji:'🧑‍💼', name:'Meet Your CA',         desc:'Baat karo AI CA se — sab kuch woh handle karega',           badge:'Start here ✨', bc:'#4F6EF7', bb:'#0d1433' },
-  { href:'/itr',           emoji:'📋', name:'ITR Filing',            desc:'Old vs new regime, AI advice, ITR form suggest',           badge:'31 July!',      bc:'#EF4444', bb:'#1a0505' },
-  { href:'/gst',           emoji:'🧾', name:'GST Returns',           desc:'GSTR-1, 3B deadlines aur AI Q&A',                         badge:'20 July due',   bc:'#F59E0B', bb:'#1f1500' },
-  { href:'/capital-gains', emoji:'📈', name:'Capital Gains',         desc:'Stocks, MF, property — STCG/LTCG auto calculate',         badge:'',              bc:'',         bb:'' },
-  { href:'/crypto',        emoji:'₿',  name:'Crypto Tax',            desc:'30% flat tax + 1% TDS har transaction pe',                badge:'',              bc:'',         bb:'' },
-  { href:'/invoice',       emoji:'🧾', name:'Invoice Generator',     desc:'GST-compliant invoice banao, print/PDF ready',            badge:'Free',          bc:'#22C55E',  bb:'#052713' },
-  { href:'/statements',    emoji:'📉', name:'Financial Statements',  desc:'Transactions se P&L, balance sheet auto',                 badge:'',              bc:'',         bb:'' },
-  { href:'/payroll',       emoji:'💰', name:'Payroll & Form 16',     desc:'Employees add karo, salary slips calculate karo',         badge:'',              bc:'',         bb:'' },
-  { href:'/tds',           emoji:'📊', name:'TDS Returns',           desc:'Calculator, rate chart, deadlines ek jagah',              badge:'',              bc:'',         bb:'' },
-  { href:'/docs',          emoji:'📂', name:'Document Vault',        desc:'Salary slip, Form 16 — AI extract kar lega',              badge:'',              bc:'',         bb:'' },
-  { href:'/notices',       emoji:'📬', name:'IT Notice Handler',     desc:'Income tax notice simple Hindi mein samjho',              badge:'',              bc:'',         bb:'' },
-  { href:'/audit',         emoji:'🔍', name:'Audit & Advisory',      desc:'Compliance checker + AI advisor',                         badge:'',              bc:'',         bb:'' },
+  { href:'/ca-session',    emoji:'🧑‍💼', name:'Meet Your CA',         desc:'Baat karo AI CA se — sab kuch woh handle karega',        badge:'Start here ✨', bc:'#4F6EF7', bb:'#0d1433' },
+  { href:'/itr',           emoji:'📋', name:'ITR Filing',            desc:'Old vs new regime compare, AI tax advice',               badge:'31 July!',      bc:'#EF4444', bb:'#1a0505' },
+  { href:'/gst',           emoji:'🧾', name:'GST Returns',           desc:'GSTR-1, 3B deadlines aur AI Q&A',                       badge:'20 July due',   bc:'#F59E0B', bb:'#1f1500' },
+  { href:'/capital-gains', emoji:'📈', name:'Capital Gains',         desc:'Stocks, MF, property — STCG/LTCG auto calculate',       badge:'',              bc:'', bb:'' },
+  { href:'/crypto',        emoji:'₿',  name:'Crypto Tax',            desc:'30% flat tax + 1% TDS har transaction pe',              badge:'',              bc:'', bb:'' },
+  { href:'/invoice',       emoji:'🧾', name:'Invoice Generator',     desc:'GST-compliant invoice banao, print/PDF ready',          badge:'Free',          bc:'#22C55E', bb:'#052713' },
+  { href:'/statements',    emoji:'📉', name:'Financial Statements',  desc:'Transactions se P&L, balance sheet auto',               badge:'',              bc:'', bb:'' },
+  { href:'/payroll',       emoji:'💰', name:'Payroll & Form 16',     desc:'Employees add karo, salary slips calculate karo',       badge:'',              bc:'', bb:'' },
+  { href:'/tds',           emoji:'📊', name:'TDS Returns',           desc:'Calculator, rate chart, deadlines ek jagah',            badge:'',              bc:'', bb:'' },
+  { href:'/notices',       emoji:'📬', name:'IT Notice Handler',     desc:'Income tax notice simple Hindi mein samjho',            badge:'',              bc:'', bb:'' },
+  { href:'/audit',         emoji:'🔍', name:'Audit & Advisory',      desc:'Compliance checker + AI advisor',                       badge:'',              bc:'', bb:'' },
+  { href:'/docs',          emoji:'📂', name:'Document Vault',        desc:'Salary slip, Form 16 — AI extract kar lega',            badge:'',              bc:'', bb:'' },
 ]
 
 export default async function DashboardPage() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  const name  = user?.user_metadata?.full_name?.split(' ')[0] || 'there'
-  const stats = await getDashboardStats()
+  // Try to get user — guests get null
+  let user = null
+  let stats = null
+  try {
+    const supabase = await createClient()
+    const { data } = await supabase.auth.getUser()
+    user = data.user
+    if (user) stats = await getDashboardStats()
+  } catch { /* guest mode */ }
 
+  const name = user?.user_metadata?.full_name?.split(' ')[0] || null
   const C = { card: { background:'var(--card)', border:'1px solid var(--border)', borderRadius:12, padding:20 } as React.CSSProperties }
 
   return (
@@ -40,13 +46,29 @@ export default async function DashboardPage() {
       {/* Header */}
       <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between' }}>
         <div>
-          <h1 style={{ fontSize:22, fontWeight:600 }}>Namaste, {name}! 👋</h1>
-          <p style={{ fontSize:14, color:'var(--muted)', marginTop:4 }}>Aapka AI CA — kisi bhi tax kaam ke liye ready hai</p>
+          <h1 style={{ fontSize:22, fontWeight:600 }}>
+            {name ? `Namaste, ${name}! 👋` : 'Namaste! 👋'}
+          </h1>
+          <p style={{ fontSize:14, color:'var(--muted)', marginTop:4 }}>Aapka AI tax assistant — kisi bhi tax kaam ke liye ready</p>
         </div>
         <Link href="/ca-session" style={{ background:'var(--accent)', color:'#fff', padding:'10px 20px', borderRadius:8, textDecoration:'none', fontSize:14, fontWeight:500 }}>
           🧑‍💼 Meet Your CA
         </Link>
       </div>
+
+      {/* Guest banner — only for non-logged-in users */}
+      {!user && (
+        <div style={{ background:'rgba(79,110,247,.08)', border:'1px solid rgba(79,110,247,.25)', borderRadius:12, padding:'14px 20px', display:'flex', alignItems:'center', gap:16 }}>
+          <span style={{ fontSize:22 }}>💾</span>
+          <div style={{ flex:1 }}>
+            <div style={{ fontSize:14, fontWeight:500 }}>Apna progress save karna chahte ho?</div>
+            <div style={{ fontSize:13, color:'var(--muted)', marginTop:2 }}>Account banao — filings, tax savings history sab save rahega</div>
+          </div>
+          <Link href="/login" style={{ background:'var(--accent)', color:'#fff', padding:'8px 18px', borderRadius:8, textDecoration:'none', fontSize:13, fontWeight:500, whiteSpace:'nowrap' }}>
+            Free mein sign up →
+          </Link>
+        </div>
+      )}
 
       {/* Deadline banner */}
       <div style={{ background:'linear-gradient(135deg,rgba(79,110,247,.15),rgba(79,110,247,.05))', border:'1px solid rgba(79,110,247,.3)', borderRadius:12, padding:'16px 20px', display:'flex', alignItems:'center', gap:16 }}>
@@ -58,8 +80,8 @@ export default async function DashboardPage() {
         <Link href="/itr" style={{ background:'var(--accent)', color:'#fff', padding:'9px 18px', borderRadius:8, textDecoration:'none', fontSize:14, fontWeight:500 }}>File now →</Link>
       </div>
 
-      {/* REAL STATS — only if user has data */}
-      {stats ? (
+      {/* Real stats — logged in users with data */}
+      {user && stats && (
         <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:16 }}>
           <div style={C.card}>
             <div style={{ fontSize:12, color:'var(--muted)', marginBottom:8 }}>Tax saved (all filings)</div>
@@ -79,15 +101,15 @@ export default async function DashboardPage() {
             </div>
           </div>
         </div>
-      ) : (
-        /* First time user — show CTA */
+      )}
+
+      {/* CTA for first-time logged-in users */}
+      {user && !stats && (
         <div style={{ background:'linear-gradient(135deg,rgba(124,58,237,.15),rgba(79,110,247,.1))', border:'1px solid rgba(124,58,237,.3)', borderRadius:12, padding:24, display:'flex', alignItems:'center', gap:20 }}>
           <div style={{ fontSize:48 }}>🧑‍💼</div>
           <div style={{ flex:1 }}>
             <div style={{ fontSize:16, fontWeight:600, marginBottom:4 }}>Pehli baar? Meet Your CA se shuru karo</div>
-            <div style={{ fontSize:13, color:'var(--muted)', lineHeight:1.6 }}>
-              Bas sawaalon ka jawab do — AI CA khud decide karega kya karna hai. ITR, tax saving sab handle ho jayega.
-            </div>
+            <div style={{ fontSize:13, color:'var(--muted)', lineHeight:1.6 }}>Bas sawaalon ka jawab do — AI CA sab handle karega</div>
           </div>
           <Link href="/ca-session" style={{ background:'linear-gradient(135deg,#7C3AED,#4F6EF7)', color:'#fff', padding:'12px 24px', borderRadius:8, textDecoration:'none', fontSize:14, fontWeight:600, whiteSpace:'nowrap' }}>
             Shuru karo ✨
@@ -95,8 +117,8 @@ export default async function DashboardPage() {
         </div>
       )}
 
-      {/* Recent filings — only if data exists */}
-      {stats && stats.recentFilings.length > 0 && (
+      {/* Recent filings */}
+      {user && stats && stats.recentFilings.length > 0 && (
         <div style={C.card}>
           <div style={{ fontSize:15, fontWeight:600, marginBottom:16 }}>📋 Recent filings</div>
           <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
@@ -128,7 +150,7 @@ export default async function DashboardPage() {
                 <div style={{ fontSize:13, fontWeight:500 }}>{d.name}</div>
                 <div style={{ fontSize:12, color:'var(--muted)' }}>Due {d.due}</div>
               </div>
-              <span style={{ fontSize:12, fontWeight:500, padding:'3px 10px', borderRadius:20, color:d.badgeColor, background:d.badgeBg }}>{d.badge}</span>
+              <span style={{ fontSize:12, fontWeight:500, padding:'3px 10px', borderRadius:20, color:d.bc, background:d.bb }}>{d.badge}</span>
             </div>
           ))}
         </div>

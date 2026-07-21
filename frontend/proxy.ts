@@ -1,6 +1,14 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
+// Pages that require login
+const PROTECTED = ['/settings']
+
+// Pages that are always public (guest can access)
+const PUBLIC = ['/login', '/dashboard', '/itr', '/gst', '/tds', '/capital-gains',
+  '/crypto', '/invoice', '/statements', '/payroll', '/docs', '/notices',
+  '/audit', '/advisor', '/ca-session']
+
 export async function proxy(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request })
 
@@ -24,13 +32,13 @@ export async function proxy(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser()
   const { pathname } = request.nextUrl
 
-  // Redirect unauthenticated users to login
-  if (!user && !pathname.startsWith('/login')) {
+  // Only /settings requires login
+  if (!user && PROTECTED.some(p => pathname.startsWith(p))) {
     return NextResponse.redirect(new URL('/login', request.url))
   }
 
-  // Redirect authenticated users away from login
-  if (user && pathname.startsWith('/login')) {
+  // Logged-in users sent away from login page
+  if (user && pathname === '/login') {
     return NextResponse.redirect(new URL('/dashboard', request.url))
   }
 
