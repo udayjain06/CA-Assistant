@@ -181,85 +181,85 @@ export default function CASessionPage() {
   }
 
   return (
-    <div style={{ display:'flex', flexDirection:'column', height:'100vh' }}>
-      <div style={{ background:'var(--surface)',borderBottom:'1px solid var(--border)',padding:'14px 24px',display:'flex',alignItems:'center',gap:12,flexShrink:0 }}>
+    <div style={{ display:'flex', flexDirection:'column', height:'calc(100dvh - 56px)', minHeight:0, flex:1 }}>
+      <div className="glass-header" style={{ padding:'12px 16px',display:'flex',alignItems:'center',gap:12,flexShrink:0,position:'sticky',top:0,zIndex:10 }}>
         <div style={{ position:'relative' }}>
-          <div style={{ width:40,height:40,borderRadius:'50%',background:'linear-gradient(135deg,#4F6EF7,#7C3AED)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:20 }}>🧑‍💼</div>
-          <div style={{ position:'absolute',bottom:1,right:1,width:10,height:10,borderRadius:'50%',background:'#22C55E',border:'2px solid var(--surface)' }}/>
+          <div style={{ width:36,height:36,borderRadius:'50%',background:'linear-gradient(135deg,#4F6EF7,#7C3AED)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:18 }}>🧑‍💼</div>
+          <div style={{ position:'absolute',bottom:1,right:1,width:9,height:9,borderRadius:'50%',background:'#22C55E',border:'2px solid var(--surface)' }}/>
         </div>
         <div>
-          <div style={{ fontSize:15,fontWeight:600 }}>TaxGenie CA</div>
-          <div style={{ fontSize:12,color:'#22C55E' }}>● Online — aapka personal AI Chartered Accountant</div>
+          <div style={{ fontSize:14,fontWeight:600,letterSpacing:'-0.01em' }}>TaxGenie CA</div>
+          <div style={{ fontSize:11,color:'#22C55E' }}>● Online — aapka personal AI CA</div>
         </div>
         {step==='results' && (
-          <button style={{ ...S.ghost,marginLeft:'auto' }} onClick={()=>{ setMessages([]); setUserData({}); setCurrentQ(0); setInitialized(false) }}>🔄 Naya session</button>
+          <button className="pressable" style={{ ...S.ghost,marginLeft:'auto',padding:'6px 12px',fontSize:12 }} onClick={()=>{ setMessages([]); setUserData({}); setCurrentQ(0); setInitialized(false) }}>🔄 Reset</button>
         )}
       </div>
 
-      <div style={{ flex:1,overflowY:'auto',padding:'20px 24px',display:'flex',flexDirection:'column',gap:12 }}>
+      <div style={{ flex:1,overflowY:'auto',padding:'16px 14px',display:'flex',flexDirection:'column',gap:12 }}>
         {messages.map(msg => (
-          <div key={msg.id}>
+          <div key={msg.id} className="msg-in">
             {msg.from==='ca' && msg.text && (
-              <div style={{ display:'flex',gap:10,alignItems:'flex-start',maxWidth:'75%' }}>
-                <div style={{ width:32,height:32,borderRadius:'50%',background:'linear-gradient(135deg,#4F6EF7,#7C3AED)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:16,flexShrink:0 }}>🧑‍💼</div>
-                <div style={{ background:'var(--card)',border:'1px solid var(--border)',borderRadius:'12px 12px 12px 0',padding:'12px 16px',fontSize:14,lineHeight:1.6 }}>{msg.text}</div>
+              <div style={{ display:'flex',gap:10,alignItems:'flex-start',maxWidth:'88%' }}>
+                <div style={{ width:30,height:30,borderRadius:'50%',background:'linear-gradient(135deg,#4F6EF7,#7C3AED)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:15,flexShrink:0 }}>🧑‍💼</div>
+                <div style={{ background:'var(--card)',border:'1px solid var(--border)',borderRadius:'12px 12px 12px 0',padding:'10px 14px',fontSize:14,lineHeight:1.6 }}>{msg.text}</div>
               </div>
             )}
             {msg.options && (
-              <div style={{ display:'flex',flexWrap:'wrap',gap:8,marginLeft:42,marginTop:8 }}>
+              <div style={{ display:'flex',flexWrap:'wrap',gap:8,marginTop:8,paddingLeft:40 }}>
                 {msg.options.map(opt => (
-                  <button key={opt} onClick={()=>handleOption(opt)} style={{ padding:'8px 16px',borderRadius:20,fontSize:13,cursor:'pointer',background:'var(--card)',border:'1px solid var(--accent)',color:'var(--accent)',fontWeight:500 }}>{opt}</button>
+                  <button key={opt} onClick={()=>handleOption(opt)} className="pressable" style={{ padding:'8px 14px',borderRadius:20,fontSize:13,cursor:'pointer',background:'var(--card)',border:'1px solid var(--accent)',color:'var(--accent)',fontWeight:500 }}>{opt}</button>
                 ))}
               </div>
             )}
             {msg.result && (
-              <div style={{ marginLeft:42,marginTop:12,display:'flex',flexDirection:'column',gap:12,maxWidth:600 }}>
-                <div style={{ background:'var(--card)',border:'1px solid var(--border)',borderRadius:12,padding:20 }}>
-                  <div style={{ fontSize:14,fontWeight:600,marginBottom:14 }}>📊 Tax Summary</div>
-                  <div style={{ display:'grid',gridTemplateColumns:'1fr 1fr',gap:12,marginBottom:12 }}>
+              <div style={{ marginTop:12,display:'flex',flexDirection:'column',gap:12,maxWidth:600,width:'100%' }}>
+                <div style={{ background:'var(--card)',border:'1px solid var(--border)',borderRadius:12,padding:16 }}>
+                  <div style={{ fontSize:14,fontWeight:600,marginBottom:12 }}>📊 Tax Summary</div>
+                  <div style={{ display:'grid',gridTemplateColumns:'repeat(auto-fit, minmax(140px, 1fr))',gap:10,marginBottom:12 }}>
                     {(['new','old'] as const).map(r => {
                       const res = msg.result as Record<string,unknown>
                       const regime = (res[`${r}R`] as Record<string,number>)
                       const isRec  = res.rec === r
                       return (
-                        <div key={r} style={{ padding:14,borderRadius:10,background:isRec?'rgba(79,110,247,.1)':'var(--surface)',border:`1px solid ${isRec?'var(--accent)':'var(--border)'}` }}>
-                          {isRec && <div style={{ fontSize:11,color:'var(--accent)',fontWeight:600,marginBottom:6 }}>⭐ BEST FOR YOU</div>}
-                          <div style={{ fontSize:13,fontWeight:600,marginBottom:6 }}>{r==='new'?'New Regime':'Old Regime'}</div>
-                          <div style={{ fontSize:12,color:'var(--muted)',marginBottom:4 }}>Taxable: {inr(regime.taxable)}</div>
-                          <div style={{ fontSize:18,fontWeight:700,color:isRec?'var(--accent)':'var(--text)' }}>{inr(regime.tax)}</div>
+                        <div key={r} style={{ padding:12,borderRadius:10,background:isRec?'rgba(79,110,247,.1)':'var(--surface)',border:`1px solid ${isRec?'var(--accent)':'var(--border)'}` }}>
+                          {isRec && <div style={{ fontSize:10,color:'var(--accent)',fontWeight:600,marginBottom:4 }}>⭐ BEST FOR YOU</div>}
+                          <div style={{ fontSize:13,fontWeight:600,marginBottom:4 }}>{r==='new'?'New Regime':'Old Regime'}</div>
+                          <div style={{ fontSize:11,color:'var(--muted)',marginBottom:2 }}>Taxable: {inr(regime.taxable)}</div>
+                          <div style={{ fontSize:17,fontWeight:700,color:isRec?'var(--accent)':'var(--text)' }}>{inr(regime.tax)}</div>
                         </div>
                       )
                     })}
                   </div>
                   <div style={{ background:'#052713',border:'1px solid #0a4020',borderRadius:8,padding:12 }}>
-                    <div style={{ fontSize:14,fontWeight:600,color:'#22C55E' }}>💰 {inr((msg.result as Record<string,number>).savings)} bachenge!</div>
+                    <div style={{ fontSize:13,fontWeight:600,color:'#22C55E' }}>💰 {inr((msg.result as Record<string,number>).savings)} bachenge!</div>
                   </div>
                 </div>
-                <div style={{ background:'var(--card)',border:'1px solid var(--border)',borderRadius:12,padding:20 }}>
+                <div style={{ background:'var(--card)',border:'1px solid var(--border)',borderRadius:12,padding:16 }}>
                   <div style={{ fontSize:14,fontWeight:600,marginBottom:12 }}>✅ Aapko yeh karna hai</div>
                   {[
-                    { icon:'📋',text:`${msg.result.itrForm as string} file karo`,sub:'Deadline: 31 July 2026',href:'/itr' },
+                    { icon:'📋',text:`${(msg.result as any).itrForm || 'ITR'} file karo`,sub:'Deadline: 31 July 2026',href:'/itr' },
                     { icon:'🤖',text:'AI se aur tips lo',sub:'Tax saving opportunities',href:'/advisor' },
                     { icon:'🔍',text:'Compliance check karo',sub:'Koi deadline toh nahi?',href:'/audit' },
                   ].map(a => (
-                    <a key={a.text} href={a.href} style={{ display:'flex',alignItems:'center',gap:12,padding:'10px 12px',borderRadius:8,textDecoration:'none',marginBottom:8,background:'var(--surface)',border:'1px solid var(--border)' }}>
-                      <span style={{ fontSize:22 }}>{a.icon}</span>
-                      <div style={{ flex:1 }}><div style={{ fontSize:13,fontWeight:500,color:'var(--text)' }}>{a.text}</div><div style={{ fontSize:12,color:'var(--muted)' }}>{a.sub}</div></div>
-                      <span style={{ color:'var(--accent)',fontSize:16 }}>→</span>
+                    <a key={a.text} href={a.href} className="pressable" style={{ display:'flex',alignItems:'center',gap:12,padding:'10px 12px',borderRadius:8,textDecoration:'none',marginBottom:8,background:'var(--surface)',border:'1px solid var(--border)' }}>
+                      <span style={{ fontSize:20 }}>{a.icon}</span>
+                      <div style={{ flex:1, minWidth:0 }}><div style={{ fontSize:13,fontWeight:500,color:'var(--text)' }}>{a.text}</div><div style={{ fontSize:11,color:'var(--muted)' }}>{a.sub}</div></div>
+                      <span style={{ color:'var(--accent)',fontSize:15 }}>→</span>
                     </a>
                   ))}
                 </div>
-                {msg.result.aiAdvice && (
-                  <div style={{ background:'var(--card)',border:'1px solid var(--border)',borderRadius:12,padding:20 }}>
+                {Boolean((msg.result as any).aiAdvice) && (
+                  <div style={{ background:'var(--card)',border:'1px solid var(--border)',borderRadius:12,padding:16 }}>
                     <div style={{ fontSize:14,fontWeight:600,marginBottom:10 }}>🤖 Personalized Tips</div>
-                    <div style={{ fontSize:13,lineHeight:1.8,color:'var(--muted)',whiteSpace:'pre-wrap',background:'var(--surface)',borderRadius:8,padding:12 }}>{msg.result.aiAdvice as string}</div>
+                    <div style={{ fontSize:13,lineHeight:1.7,color:'var(--muted)',whiteSpace:'pre-wrap',background:'var(--surface)',borderRadius:8,padding:12 }}>{(msg.result as any).aiAdvice as string}</div>
                   </div>
                 )}
               </div>
             )}
             {msg.from==='user' && (
               <div style={{ display:'flex',justifyContent:'flex-end',marginTop:4 }}>
-                <div style={{ background:'var(--accent)',color:'#fff',borderRadius:'12px 12px 0 12px',padding:'10px 16px',fontSize:14,maxWidth:'60%' }}>{msg.text}</div>
+                <div style={{ background:'var(--accent)',color:'#fff',borderRadius:'12px 12px 0 12px',padding:'10px 14px',fontSize:14,maxWidth:'80%' }}>{msg.text}</div>
               </div>
             )}
           </div>
@@ -268,10 +268,10 @@ export default function CASessionPage() {
       </div>
 
       {(step==='welcome'||step==='identify'||step==='collect') && (
-        <div style={{ padding:'14px 24px',background:'var(--surface)',borderTop:'1px solid var(--border)',display:'flex',gap:10,flexShrink:0 }}>
+        <div className="glass-header" style={{ padding:'12px 14px',borderTop:'1px solid rgba(255, 255, 255, 0.08)',borderBottom:'none',display:'flex',gap:10,flexShrink:0 }}>
           <input ref={inputRef} value={inputVal} onChange={e=>setInputVal(e.target.value)} onKeyDown={e=>e.key==='Enter'&&handleInput()}
-            placeholder="Jawab likho..." style={{ flex:1,background:'var(--card)',border:'1px solid var(--border2)',borderRadius:10,padding:'12px 16px',color:'var(--text)',fontSize:14,outline:'none' }}/>
-          <button onClick={handleInput} disabled={!inputVal.trim()} style={{ ...S.btn,opacity:inputVal.trim()?1:0.5,padding:'0 20px',fontSize:20 }}>↑</button>
+            placeholder="Jawab likho..." style={{ flex:1,background:'var(--card)',border:'1px solid var(--border2)',borderRadius:10,padding:'10px 14px',color:'var(--text)',fontSize:14,outline:'none' }}/>
+          <button className="pressable" onClick={handleInput} disabled={!inputVal.trim()} aria-label="Send" style={{ ...S.btn,opacity:inputVal.trim()?1:0.5,padding:'0 18px',fontSize:18 }}>↑</button>
         </div>
       )}
     </div>

@@ -58,17 +58,17 @@ export default function AdvisorPage() {
   const B: React.CSSProperties = { background:'var(--card)', border:'1px solid var(--border)', borderRadius:10, padding:'12px 16px', fontSize:14, lineHeight:1.6, whiteSpace:'pre-wrap', color:'var(--text)' }
 
   return (
-    <div style={{ display:'flex', flexDirection:'column', height:'100vh' }}>
-      <div style={{ background:'var(--surface)', borderBottom:'1px solid var(--border)', padding:'16px 28px', display:'flex', alignItems:'center', gap:12 }}>
-        <div style={{ width:36,height:36,borderRadius:8,background:'var(--accent)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:18 }}>🤖</div>
-        <div><div style={{ fontSize:16,fontWeight:600 }}>AI Tax Advisor</div><div style={{ fontSize:12,color:'var(--muted)' }}>India GST, ITR, compliance — sab kuch</div></div>
+    <div style={{ display:'flex', flexDirection:'column', height:'calc(100dvh - 56px)', minHeight:0, flex:1 }}>
+      <div className="glass-header" style={{ padding:'12px 16px',display:'flex',alignItems:'center',gap:12,position:'sticky',top:0,zIndex:10,flexShrink:0 }}>
+        <div style={{ width:34,height:34,borderRadius:8,background:'var(--accent)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:17 }}>🤖</div>
+        <div><div style={{ fontSize:15,fontWeight:600 }}>AI Tax Advisor</div><div style={{ fontSize:11,color:'var(--muted)' }}>India GST, ITR, compliance</div></div>
         <div style={{ marginLeft:'auto',display:'flex',alignItems:'center',gap:6 }}><div style={{ width:8,height:8,borderRadius:'50%',background:'#22C55E' }}/><span style={{ fontSize:12,color:'#22C55E' }}>Online</span></div>
       </div>
-      <div style={{ flex:1,overflowY:'auto',padding:'24px 28px',display:'flex',flexDirection:'column',gap:16 }}>
+      <div style={{ flex:1,overflowY:'auto',padding:'16px 14px',display:'flex',flexDirection:'column',gap:14 }}>
         {messages.map((m,i) => (
-          <div key={i} style={{ display:'flex', justifyContent:m.role==='user'?'flex-end':'flex-start' }}>
-            {m.role==='assistant' && <div style={{ width:32,height:32,borderRadius:'50%',background:'var(--accent)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:16,marginRight:10,flexShrink:0 }}>🧾</div>}
-            <div style={{ ...B, maxWidth:'72%', borderRadius:m.role==='user'?'12px 12px 0 12px':'12px 12px 12px 0', background:m.role==='user'?'var(--accent)':B.background, border:m.role==='user'?'none':B.border }}>
+          <div key={i} className="msg-in" style={{ display:'flex', justifyContent:m.role==='user'?'flex-end':'flex-start' }}>
+            {m.role==='assistant' && <div style={{ width:30,height:30,borderRadius:'50%',background:'var(--accent)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:15,marginRight:8,flexShrink:0 }}>🧾</div>}
+            <div style={{ ...B, maxWidth:'85%', padding:'10px 14px', borderRadius:m.role==='user'?'12px 12px 0 12px':'12px 12px 12px 0', background:m.role==='user'?'var(--accent)':B.background, border:m.role==='user'?'none':B.border }}>
               {m.content}{loading && i===messages.length-1 && m.role==='assistant' && <span style={{ opacity:0.5 }}>▋</span>}
             </div>
           </div>
@@ -76,14 +76,14 @@ export default function AdvisorPage() {
         <div ref={bottomRef}/>
       </div>
       {messages.length <= 2 && (
-        <div style={{ padding:'0 28px 12px',display:'flex',gap:8,flexWrap:'wrap' }}>
-          {SUGGESTIONS.map(s => <button key={s} onClick={() => send(s)} style={{ padding:'6px 14px',borderRadius:20,fontSize:12,cursor:'pointer',background:'var(--card)',border:'1px solid var(--border)',color:'var(--muted)' }}>{s}</button>)}
+        <div style={{ padding:'0 14px 10px',display:'flex',gap:6,flexWrap:'wrap' }}>
+          {SUGGESTIONS.map(s => <button key={s} onClick={() => send(s)} className="pressable" style={{ padding:'6px 12px',borderRadius:20,fontSize:12,cursor:'pointer',background:'var(--card)',border:'1px solid var(--border)',color:'var(--muted)' }}>{s}</button>)}
         </div>
       )}
-      <div style={{ padding:'16px 28px',background:'var(--surface)',borderTop:'1px solid var(--border)',display:'flex',gap:12 }}>
+      <div className="glass-header" style={{ padding:'12px 14px',borderTop:'1px solid rgba(255, 255, 255, 0.08)',borderBottom:'none',display:'flex',gap:10,flexShrink:0 }}>
         <input value={input} onChange={e=>setInput(e.target.value)} onKeyDown={e=>{ if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send()} }}
-          placeholder="Tax ke baare mein kuch bhi poochho..." style={{ flex:1,background:'var(--card)',border:'1px solid var(--border2)',borderRadius:10,padding:'12px 16px',color:'var(--text)',fontSize:14,outline:'none' }}/>
-        <button onClick={()=>send()} disabled={loading||!input.trim()} style={{ background:'var(--accent)',color:'#fff',border:'none',borderRadius:10,padding:'0 20px',fontSize:20,cursor:'pointer',opacity:loading||!input.trim()?0.5:1 }}>↑</button>
+          placeholder="Tax ke baare mein kuch bhi poochho..." style={{ flex:1,background:'var(--card)',border:'1px solid var(--border2)',borderRadius:10,padding:'10px 14px',color:'var(--text)',fontSize:14,outline:'none' }}/>
+        <button className="pressable" onClick={()=>send()} disabled={loading||!input.trim()} aria-label="Send message" style={{ background:'var(--accent)',color:'#fff',border:'none',borderRadius:10,padding:'0 18px',fontSize:18,cursor:'pointer',opacity:loading||!input.trim()?0.5:1 }}>↑</button>
       </div>
     </div>
   )

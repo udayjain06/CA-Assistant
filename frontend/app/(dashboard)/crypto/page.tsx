@@ -41,12 +41,12 @@ export default function CryptoPage() {
   }
 
   return (
-    <div style={{ padding: 28 }}>
-      <h1 style={{ fontSize: 22, fontWeight: 600, marginBottom: 8 }}>Crypto Tax Calculator</h1>
+    <div className="page-container">
+      <h1 style={{ marginBottom: 8 }}>Crypto Tax Calculator</h1>
       <p style={{ fontSize: 14, color: 'var(--muted)', marginBottom: 24 }}>As per Section 115BBH — Crypto, NFT, Virtual Digital Assets (VDA)</p>
 
       {/* Rules banner */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 12, marginBottom: 20 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 12, marginBottom: 20 }}>
         {[
           { icon: '⚡', title: '30% flat tax', desc: 'No deductions except cost of acquisition. No loss set-off against other income.' },
           { icon: '🏦', title: '1% TDS (Sec 194S)', desc: 'Deducted on every sale above ₹50K/year (₹10K for specified persons).' },
@@ -54,46 +54,46 @@ export default function CryptoPage() {
         ].map(r => (
           <div key={r.title} style={{ background: '#1a0505', border: '1px solid #3d1010', borderRadius: 10, padding: 14 }}>
             <div style={{ fontSize: 20, marginBottom: 6 }}>{r.icon}</div>
-            <div style={{ fontSize: 13, fontWeight: 600, color: '#EF4444', marginBottom: 4 }}>{r.title}</div>
+            <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--red)', marginBottom: 4 }}>{r.title}</div>
             <div style={{ fontSize: 12, color: 'var(--muted)', lineHeight: 1.5 }}>{r.desc}</div>
           </div>
         ))}
       </div>
 
       {/* Summary */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 12, marginBottom: 20 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 12, marginBottom: 20 }}>
         {[
-          { label: 'Total gains', val: inr(totalGain), color: '#22C55E' },
-          { label: 'Total losses (ignored)', val: inr(Math.abs(totalLoss)), color: '#EF4444' },
-          { label: 'Tax @ 30% + cess', val: inr(totalTax), color: '#EF4444' },
-          { label: 'TDS deducted (1%)', val: inr(totalTDS), color: '#F59E0B' },
+          { label: 'Total gains', val: inr(totalGain), color: 'var(--green)' },
+          { label: 'Total losses (ignored)', val: inr(Math.abs(totalLoss)), color: 'var(--red)' },
+          { label: 'Tax @ 30% + cess', val: inr(totalTax), color: 'var(--red)' },
+          { label: 'TDS deducted (1%)', val: inr(totalTDS), color: 'var(--amber)' },
         ].map(c => (
           <div key={c.label} style={S.card}>
             <div style={{ fontSize: 12, color: 'var(--muted)', marginBottom: 6 }}>{c.label}</div>
-            <div style={{ fontSize: 22, fontWeight: 700, color: c.color }}>{c.val}</div>
+            <div style={{ fontSize: 22, fontWeight: 700, color: c.color, letterSpacing: '-0.02em' }}>{c.val}</div>
           </div>
         ))}
       </div>
 
       {/* Trades */}
       <div style={S.card}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}>
-          <div style={{ fontSize: 15, fontWeight: 600 }}>Crypto transactions</div>
-          <button style={S.ghost} onClick={add}>+ Add transaction</button>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+          <div style={{ fontSize: 15, fontWeight: 600, letterSpacing: '-0.01em' }}>Crypto transactions</div>
+          <button className="pressable" style={S.ghost} onClick={add}>+ Add transaction</button>
         </div>
 
         {trades.map(t => {
           const r = calcTrade(t)
           return (
-            <div key={t.id} style={{ background: 'var(--surface)', borderRadius: 10, padding: 14, marginBottom: 10, border: `1px solid ${r.gain < 0 ? '#EF444430' : '#22C55E30'}` }}>
-              <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr 1fr 1fr auto', gap: 10, marginBottom: 8 }}>
+            <div key={t.id} style={{ background: 'var(--surface)', borderRadius: 10, padding: 14, marginBottom: 10, border: `1px solid ${r.gain < 0 ? 'var(--red)30' : 'var(--green)30'}` }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: 10, marginBottom: 8 }}>
                 <div>
                   <div style={{ fontSize: 11, color: 'var(--muted)', marginBottom: 3 }}>Coin/Token</div>
                   <input style={S.inp} value={t.coin} onChange={e => upd(t.id, 'coin', e.target.value)} placeholder="Bitcoin, ETH, USDT..." />
                 </div>
                 <div>
                   <div style={{ fontSize: 11, color: 'var(--muted)', marginBottom: 3 }}>Type</div>
-                  <select style={S.inp} value={t.type} onChange={e => upd(t.id, 'type', e.target.value)}>
+                  <select style={S.inp} value={t.type} onChange={e => upd(t.id, 'type', e.target.value as Trade['type'])}>
                     <option value="sell">Sell</option>
                     <option value="swap">Swap</option>
                     <option value="income">Income (mining/staking)</option>
@@ -115,19 +115,21 @@ export default function CryptoPage() {
                   <div style={{ fontSize: 11, color: 'var(--muted)', marginBottom: 3 }}>Date</div>
                   <input style={S.inp} type="date" value={t.date} onChange={e => upd(t.id, 'date', e.target.value)} />
                 </div>
-                <button onClick={() => del(t.id)} style={{ background: 'none', border: 'none', color: 'var(--red)', cursor: 'pointer', fontSize: 18, alignSelf: 'flex-end', paddingBottom: 4 }}>×</button>
+                <div style={{ display: 'flex', alignItems: 'flex-end' }}>
+                  <button className="pressable" onClick={() => del(t.id)} aria-label="Delete trade" style={{ background: 'none', border: 'none', color: 'var(--red)', cursor: 'pointer', fontSize: 18, paddingBottom: 6 }}>×</button>
+                </div>
               </div>
 
               {(t.buyPrice && t.sellPrice) && (
-                <div style={{ display: 'flex', gap: 20, fontSize: 12 }}>
+                <div style={{ display: 'flex', gap: 20, fontSize: 12, flexWrap: 'wrap' }}>
                   <span>Sale value: <b>{inr(r.saleValue)}</b></span>
                   <span>Cost: <b>{inr(r.costValue)}</b></span>
-                  <span style={{ color: r.gain >= 0 ? '#22C55E' : '#EF4444' }}>
+                  <span style={{ color: r.gain >= 0 ? 'var(--green)' : 'var(--red)' }}>
                     {r.gain >= 0 ? 'Gain' : 'Loss'}: <b>{inr(Math.abs(r.gain))}</b>
                   </span>
-                  {r.gain > 0 && <span style={{ color: '#EF4444' }}>Tax (30%+cess): <b>{inr(r.tax)}</b></span>}
-                  <span style={{ color: '#F59E0B' }}>TDS (1%): <b>{inr(r.tds)}</b></span>
-                  {r.gain < 0 && <span style={{ color: '#F59E0B' }}>⚠️ Loss cannot be set off</span>}
+                  {r.gain > 0 && <span style={{ color: 'var(--red)' }}>Tax (30%+cess): <b>{inr(r.tax)}</b></span>}
+                  <span style={{ color: 'var(--amber)' }}>TDS (1%): <b>{inr(r.tds)}</b></span>
+                  {r.gain < 0 && <span style={{ color: 'var(--amber)' }}>⚠️ Loss cannot be set off</span>}
                 </div>
               )}
             </div>

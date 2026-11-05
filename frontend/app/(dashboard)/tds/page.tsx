@@ -45,19 +45,19 @@ export default function TDSPage() {
   }
 
   return (
-    <div style={{padding:28}}>
-      <h1 style={{fontSize:22,fontWeight:600,marginBottom:24}}>TDS Returns</h1>
+    <div className="page-container">
+      <h1 style={{marginBottom:24}}>TDS Returns</h1>
 
-      <div style={{display:'flex',borderBottom:'1px solid var(--border)',marginBottom:24}}>
-        <button style={S.tab(tab==='calc')} onClick={()=>setTab('calc')}>🧮 TDS Calculator</button>
-        <button style={S.tab(tab==='rates')} onClick={()=>setTab('rates')}>📋 TDS Rates</button>
-        <button style={S.tab(tab==='deadlines')} onClick={()=>setTab('deadlines')}>📅 Deadlines</button>
+      <div className="scrollable-tabs" style={{display:'flex',borderBottom:'1px solid var(--border)',marginBottom:24}}>
+        <button className="pressable" style={S.tab(tab==='calc')} onClick={()=>setTab('calc')}>🧮 TDS Calculator</button>
+        <button className="pressable" style={S.tab(tab==='rates')} onClick={()=>setTab('rates')}>📋 TDS Rates</button>
+        <button className="pressable" style={S.tab(tab==='deadlines')} onClick={()=>setTab('deadlines')}>📅 Deadlines</button>
       </div>
 
       {tab==='calc' && (
-        <div style={{maxWidth:600}}>
+        <div className="fade-in" style={{maxWidth:600}}>
           <div style={S.card}>
-            <div style={{fontSize:15,fontWeight:600,marginBottom:20}}>TDS Calculator</div>
+            <div style={{fontSize:15,fontWeight:600,marginBottom:20,letterSpacing:'-0.01em'}}>TDS Calculator</div>
             <div style={{display:'flex',flexDirection:'column',gap:14}}>
               <div>
                 <label style={{fontSize:13,color:'var(--muted)',display:'block',marginBottom:6}}>Payment type (Section)</label>
@@ -75,14 +75,14 @@ export default function TDSPage() {
                   <label htmlFor="company" style={{fontSize:13,color:'var(--muted)'}}>Payee is a company (2% rate applies)</label>
                 </div>
               )}
-              <button style={S.btn} onClick={calculate}>Calculate TDS</button>
+              <button className="pressable" style={S.btn} onClick={calculate}>Calculate TDS</button>
             </div>
           </div>
 
           {result && (
-            <div style={{...S.card,marginTop:16}}>
+            <div className="fade-in" style={{...S.card,marginTop:16}}>
               {!result.aboveThreshold ? (
-                <div style={{background:'#052713',border:'1px solid #0a4020',borderRadius:8,padding:14,color:'#22C55E',fontSize:14}}>
+                <div role="status" style={{background:'#052713',border:'1px solid #0a4020',borderRadius:8,padding:14,color:'var(--green)',fontSize:14}}>
                   ✅ TDS nahi katna — Amount (₹{result.amt.toLocaleString('en-IN')}) threshold (₹{result.threshold.toLocaleString('en-IN')}) se kam hai!
                 </div>
               ) : (
@@ -109,9 +109,9 @@ export default function TDSPage() {
       )}
 
       {tab==='rates' && (
-        <div style={S.card}>
-          <div style={{fontSize:15,fontWeight:600,marginBottom:16}}>TDS Rate Chart (FY 2025-26)</div>
-          <div style={{display:'grid',gridTemplateColumns:'auto 2fr 1fr 1fr 2fr',gap:0}}>
+        <div className="fade-in" style={{...S.card, overflowX:'auto', WebkitOverflowScrolling:'touch'}}>
+          <div style={{fontSize:15,fontWeight:600,marginBottom:16,letterSpacing:'-0.01em'}}>TDS Rate Chart (FY 2025-26)</div>
+          <div style={{display:'grid',gridTemplateColumns:'auto 2fr 1fr 1fr 2fr',gap:0,minWidth:500}}>
             {['Section','Nature of Payment','Threshold','Rate','Note'].map(h=>(
               <div key={h} style={{fontSize:11,color:'var(--muted)',textTransform:'uppercase',padding:'8px 12px',background:'var(--surface)',borderBottom:'1px solid var(--border)'}}>{h}</div>
             ))}
@@ -119,7 +119,7 @@ export default function TDSPage() {
               <div key={r.section+'s'} style={{padding:'10px 12px',borderBottom:'1px solid var(--border)',fontSize:13,fontWeight:600,color:'var(--accent)'}}>{r.section}</div>,
               <div key={r.section+'n'} style={{padding:'10px 12px',borderBottom:'1px solid var(--border)',fontSize:13}}>{r.nature}</div>,
               <div key={r.section+'t'} style={{padding:'10px 12px',borderBottom:'1px solid var(--border)',fontSize:13}}>{inr(r.threshold)}</div>,
-              <div key={r.section+'r'} style={{padding:'10px 12px',borderBottom:'1px solid var(--border)',fontSize:13,fontWeight:600,color:'#EF4444'}}>{r.rate}%</div>,
+              <div key={r.section+'r'} style={{padding:'10px 12px',borderBottom:'1px solid var(--border)',fontSize:13,fontWeight:600,color:'var(--red)'}}>{r.rate}%</div>,
               <div key={r.section+'no'} style={{padding:'10px 12px',borderBottom:'1px solid var(--border)',fontSize:12,color:'var(--muted)'}}>{r.note}</div>,
             ])}
           </div>
@@ -127,7 +127,7 @@ export default function TDSPage() {
       )}
 
       {tab==='deadlines' && (
-        <div style={{display:'flex',flexDirection:'column',gap:16,maxWidth:700}}>
+        <div className="fade-in" style={{display:'flex',flexDirection:'column',gap:16,maxWidth:700}}>
           <div style={{background:'rgba(239,68,68,.1)',border:'1px solid rgba(239,68,68,.3)',borderRadius:10,padding:'12px 16px',fontSize:14}}>
             ⚠️ TDS deposit deadline: <b>7th of every next month</b> (March: 30th April). Late fee: ₹200/day under Sec 234E
           </div>
@@ -151,7 +151,7 @@ export default function TDSPage() {
             ].map(({l,v})=>(
               <div key={l} style={{display:'flex',justifyContent:'space-between',padding:'8px 0',borderBottom:'1px solid var(--border)'}}>
                 <span style={{fontSize:13,color:'var(--muted)'}}>{l}</span>
-                <span style={{fontSize:13,fontWeight:500,color:'#EF4444'}}>{v}</span>
+                <span style={{fontSize:13,fontWeight:500,color:'var(--red)'}}>{v}</span>
               </div>
             ))}
           </div>

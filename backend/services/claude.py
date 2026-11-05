@@ -2,7 +2,7 @@ import os
 import re
 from groq import Groq
 
-client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+client = Groq(api_key=os.getenv("GROQ_API_KEY") or "gsk_placeholder_key")
 MODEL  = "llama-3.3-70b-versatile"
 
 SYSTEM_PROMPT = """You are TaxGenie, an expert AI Chartered Accountant for India.
@@ -30,6 +30,9 @@ def _sanitize(text: str, max_len: int = 5000) -> str:
 
 
 def ask_claude(messages: list[dict], system: str = SYSTEM_PROMPT) -> str:
+    if not os.getenv("GROQ_API_KEY"):
+        return "AI features require a GROQ_API_KEY. Add GROQ_API_KEY=your_key to backend/.env to enable live AI responses."
+
     # Sanitize all user messages
     safe_messages = []
     for msg in messages:
@@ -48,6 +51,10 @@ def ask_claude(messages: list[dict], system: str = SYSTEM_PROMPT) -> str:
 
 
 def ask_claude_stream(messages: list[dict], system: str = SYSTEM_PROMPT):
+    if not os.getenv("GROQ_API_KEY"):
+        yield "AI features require a GROQ_API_KEY. Add GROQ_API_KEY=your_key to backend/.env to enable live AI chat."
+        return
+
     safe_messages = []
     for msg in messages:
         if msg["role"] == "user":

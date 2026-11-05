@@ -1,7 +1,7 @@
 'use client'
 import { useState } from 'react'
 
-const API = 'process.env.NEXT_PUBLIC_API_URL!'
+const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
 
 const SAMPLE = [
   { desc:'Client payment - ABC Corp', amount:'150000', type:'income', category:'Revenue' },
@@ -66,28 +66,28 @@ export default function StatementsPage() {
   }
 
   if (view==='results') return (
-    <div style={{padding:28}}>
-      <div style={{display:'flex',alignItems:'center',gap:12,marginBottom:24}}>
-        <button style={S.ghost} onClick={()=>setView('input')}>← Back</button>
-        <h1 style={{fontSize:22,fontWeight:600}}>{company} — {period}</h1>
+    <div className="page-container">
+      <div style={{display:'flex',alignItems:'center',gap:12,marginBottom:24,flexWrap:'wrap'}}>
+        <button className="pressable" style={S.ghost} onClick={()=>setView('input')}>← Back</button>
+        <h1 style={{marginBottom:0}}>{company} — {period}</h1>
       </div>
 
       {/* Summary cards */}
-      <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:16,marginBottom:24}}>
+      <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit, minmax(180px, 1fr))',gap:16,marginBottom:24}}>
         {[
-          {label:'Total Revenue',val:inr(income),color:'#22C55E'},
-          {label:'Total Expenses',val:inr(expenses),color:'#EF4444'},
-          {label:profit>=0?'Net Profit':'Net Loss',val:inr(Math.abs(profit)),color:profit>=0?'#22C55E':'#EF4444'},
+          {label:'Total Revenue',val:inr(income),color:'var(--green)'},
+          {label:'Total Expenses',val:inr(expenses),color:'var(--red)'},
+          {label:profit>=0?'Net Profit':'Net Loss',val:inr(Math.abs(profit)),color:profit>=0?'var(--green)':'var(--red)'},
         ].map(c=>(
           <div key={c.label} style={{...S.card}}>
             <div style={{fontSize:12,color:'var(--muted)',marginBottom:6}}>{c.label}</div>
-            <div style={{fontSize:28,fontWeight:700,color:c.color}}>{c.val}</div>
+            <div style={{fontSize:24,fontWeight:700,color:c.color,letterSpacing:'-0.02em'}}>{c.val}</div>
             {c.label.includes('Profit')&&<div style={{fontSize:12,color:'var(--muted)',marginTop:4}}>Margin: {income>0?((profit/income)*100).toFixed(1):0}%</div>}
           </div>
         ))}
       </div>
 
-      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:20,marginBottom:20}}>
+      <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit, minmax(280px, 1fr))',gap:20,marginBottom:20}}>
         {/* P&L */}
         <div style={S.card}>
           <div style={{fontSize:15,fontWeight:600,marginBottom:16}}>📈 Profit & Loss Statement</div>
@@ -131,9 +131,9 @@ export default function StatementsPage() {
   )
 
   return (
-    <div style={{padding:28}}>
-      <h1 style={{fontSize:22,fontWeight:600,marginBottom:24}}>Financial Statements</h1>
-      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:16,marginBottom:20,maxWidth:600}}>
+    <div className="page-container">
+      <h1 style={{marginBottom:24}}>Financial Statements</h1>
+      <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit, minmax(200px, 1fr))',gap:16,marginBottom:20,maxWidth:600}}>
         <div>
           <label style={{fontSize:13,color:'var(--muted)',display:'block',marginBottom:6}}>Business name</label>
           <input style={{...S.inp,width:'100%'}} value={company} onChange={e=>setCompany(e.target.value)}/>
@@ -145,34 +145,40 @@ export default function StatementsPage() {
       </div>
 
       <div style={S.card}>
-        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:16}}>
-          <div style={{fontSize:15,fontWeight:600}}>Transactions</div>
-          <button style={S.ghost} onClick={addRow}>+ Add row</button>
+        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:16,flexWrap:'wrap',gap:8}}>
+          <div style={{fontSize:15,fontWeight:600,letterSpacing:'-0.01em'}}>Transactions</div>
+          <button className="pressable" style={S.ghost} onClick={addRow}>+ Add row</button>
         </div>
-        <div style={{display:'grid',gridTemplateColumns:'2fr 1fr 1fr 1fr auto',gap:8,marginBottom:8}}>
-          {['Description','Amount (₹)','Type','Category',''].map(h=>(
-            <div key={h} style={{fontSize:11,color:'var(--muted)',textTransform:'uppercase',letterSpacing:'0.5px'}}>{h}</div>
-          ))}
+
+        <div style={{overflowX:'auto',WebkitOverflowScrolling:'touch',paddingBottom:8}}>
+          <div style={{minWidth:500}}>
+            <div style={{display:'grid',gridTemplateColumns:'2fr 1fr 1fr 1.2fr 36px',gap:8,marginBottom:8}}>
+              {['Description','Amount (₹)','Type','Category',''].map(h=>(
+                <div key={h} style={{fontSize:11,color:'var(--muted)',textTransform:'uppercase',letterSpacing:'0.04em'}}>{h}</div>
+              ))}
+            </div>
+            {rows.map(row=>(
+              <div key={row.id} style={{display:'grid',gridTemplateColumns:'2fr 1fr 1fr 1.2fr 36px',gap:8,marginBottom:8}}>
+                <input style={{...S.inp}} value={row.desc} onChange={e=>updateRow(row.id,'desc',e.target.value)} placeholder="Description"/>
+                <input style={{...S.inp}} type="number" value={row.amount} onChange={e=>updateRow(row.id,'amount',e.target.value)} placeholder="0"/>
+                <select style={{...S.inp}} value={row.type} onChange={e=>updateRow(row.id,'type',e.target.value)}>
+                  <option value="income">Income</option>
+                  <option value="expense">Expense</option>
+                </select>
+                <input style={{...S.inp}} value={row.category} onChange={e=>updateRow(row.id,'category',e.target.value)} placeholder="e.g. Rent"/>
+                <button className="pressable" onClick={()=>removeRow(row.id)} aria-label="Delete row" style={{background:'none',border:'none',color:'var(--red)',cursor:'pointer',fontSize:18,display:'flex',alignItems:'center',justifyContent:'center'}}>×</button>
+              </div>
+            ))}
+          </div>
         </div>
-        {rows.map(row=>(
-          <div key={row.id} style={{display:'grid',gridTemplateColumns:'2fr 1fr 1fr 1fr auto',gap:8,marginBottom:8}}>
-            <input style={{...S.inp}} value={row.desc} onChange={e=>updateRow(row.id,'desc',e.target.value)} placeholder="Description"/>
-            <input style={{...S.inp}} type="number" value={row.amount} onChange={e=>updateRow(row.id,'amount',e.target.value)} placeholder="0"/>
-            <select style={{...S.inp}} value={row.type} onChange={e=>updateRow(row.id,'type',e.target.value)}>
-              <option value="income">Income</option>
-              <option value="expense">Expense</option>
-            </select>
-            <input style={{...S.inp}} value={row.category} onChange={e=>updateRow(row.id,'category',e.target.value)} placeholder="e.g. Rent"/>
-            <button onClick={()=>removeRow(row.id)} style={{background:'none',border:'none',color:'var(--red)',cursor:'pointer',fontSize:18}}>×</button>
+
+        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginTop:16,paddingTop:16,borderTop:'1px solid var(--border)',flexWrap:'wrap',gap:12}}>
+          <div style={{display:'flex',gap:16,fontSize:14,flexWrap:'wrap'}}>
+            <span style={{color:'var(--green)'}}>Income: {inr(income)}</span>
+            <span style={{color:'var(--red)'}}>Expenses: {inr(expenses)}</span>
+            <span style={{color:profit>=0?'var(--green)':'var(--red)',fontWeight:600}}>Net: {inr(profit)}</span>
           </div>
-        ))}
-        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginTop:16,paddingTop:16,borderTop:'1px solid var(--border)'}}>
-          <div style={{display:'flex',gap:16,fontSize:14}}>
-            <span style={{color:'#22C55E'}}>Income: {inr(income)}</span>
-            <span style={{color:'#EF4444'}}>Expenses: {inr(expenses)}</span>
-            <span style={{color:profit>=0?'#22C55E':'#EF4444',fontWeight:600}}>Net: {inr(profit)}</span>
-          </div>
-          <button style={{...S.btn,opacity:loading?.6:1}} onClick={getAnalysis} disabled={loading}>
+          <button className="pressable" style={{...S.btn,opacity:loading?.6:1}} onClick={getAnalysis} disabled={loading}>
             {loading?'🤖 Analyzing...':'📊 Generate Statements'}
           </button>
         </div>

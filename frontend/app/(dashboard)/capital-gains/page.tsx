@@ -1,5 +1,6 @@
 'use client'
 import { useState } from 'react'
+import IOSSheet from '@/components/ui/IOSSheet'
 
 const inr = (n: number) => '₹' + Math.round(n).toLocaleString('en-IN')
 
@@ -75,41 +76,42 @@ export default function CapitalGainsPage() {
   }
 
   return (
-    <div style={{ padding: 28 }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-        <h1 style={{ fontSize: 22, fontWeight: 600 }}>Capital Gains Calculator</h1>
-        <button style={S.ghost} onClick={() => setShowInfo(!showInfo)}>ℹ️ Tax rates</button>
+    <div className="page-container">
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24, flexWrap: 'wrap', gap: 12 }}>
+        <h1 style={{ marginBottom: 0 }}>Capital Gains Calculator</h1>
+        <button className="pressable" style={S.ghost} onClick={() => setShowInfo(!showInfo)}>ℹ️ Tax rates</button>
       </div>
 
-      {showInfo && (
-        <div style={{ ...S.card, marginBottom: 20, display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 12 }}>
+      {/* iOS Bottom Sheet: Tax Rates Info */}
+      <IOSSheet isOpen={showInfo} onClose={() => setShowInfo(false)} title="ℹ️ Capital Gains Tax Rates">
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 12 }}>
           {[
             { asset: '📈 Equity/MF', stcg: '20% (< 1 yr)', ltcg: '12.5% above ₹1.25L (> 1 yr)' },
             { asset: '🏦 Debt MF', stcg: 'As per slab', ltcg: 'As per slab (post Apr 2023)' },
             { asset: '🏠 Property', stcg: 'As per slab (< 2 yr)', ltcg: '12.5% no indexation (> 2 yr)' },
             { asset: '🥇 Gold', stcg: 'As per slab (< 3 yr)', ltcg: '12.5% (> 3 yr)' },
           ].map(r => (
-            <div key={r.asset} style={{ background: 'var(--surface)', borderRadius: 8, padding: 12 }}>
-              <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 6 }}>{r.asset}</div>
-              <div style={{ fontSize: 12, color: 'var(--muted)', marginBottom: 4 }}>STCG: {r.stcg}</div>
-              <div style={{ fontSize: 12, color: '#22C55E' }}>LTCG: {r.ltcg}</div>
+            <div key={r.asset} style={{ background: 'var(--surface)', borderRadius: 10, padding: 14, border: '1px solid var(--border)' }}>
+              <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 8 }}>{r.asset}</div>
+              <div style={{ fontSize: 13, color: 'var(--muted)', marginBottom: 6 }}>STCG: {r.stcg}</div>
+              <div style={{ fontSize: 13, color: 'var(--green)', fontWeight: 500 }}>LTCG: {r.ltcg}</div>
             </div>
           ))}
         </div>
-      )}
+      </IOSSheet>
 
       {/* Summary */}
       {entries.length > 0 && (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 12, marginBottom: 20 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 12, marginBottom: 20 }}>
           {[
-            { label: 'Total gains', val: inr(totalGain), color: totalGain >= 0 ? '#22C55E' : '#EF4444' },
+            { label: 'Total gains', val: inr(totalGain), color: totalGain >= 0 ? 'var(--green)' : 'var(--red)' },
             { label: 'STCG', val: inr(stcgTotal), color: 'var(--text)' },
             { label: 'LTCG', val: inr(ltcgTotal), color: 'var(--text)' },
-            { label: 'Estimated tax', val: inr(totalTax), color: '#EF4444' },
+            { label: 'Estimated tax', val: inr(totalTax), color: 'var(--red)' },
           ].map(c => (
             <div key={c.label} style={S.card}>
               <div style={{ fontSize: 12, color: 'var(--muted)', marginBottom: 6 }}>{c.label}</div>
-              <div style={{ fontSize: 22, fontWeight: 700, color: c.color }}>{c.val}</div>
+              <div style={{ fontSize: 22, fontWeight: 700, color: c.color, letterSpacing: '-0.02em' }}>{c.val}</div>
             </div>
           ))}
         </div>
@@ -117,23 +119,23 @@ export default function CapitalGainsPage() {
 
       {/* Entries */}
       <div style={S.card}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}>
-          <div style={{ fontSize: 15, fontWeight: 600 }}>Your transactions</div>
-          <button style={S.ghost} onClick={add}>+ Add transaction</button>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+          <div style={{ fontSize: 15, fontWeight: 600, letterSpacing: '-0.01em' }}>Your transactions</div>
+          <button className="pressable" style={S.ghost} onClick={add}>+ Add transaction</button>
         </div>
 
         {entries.map((e, i) => {
           const r = results[i]
           return (
-            <div key={e.id} style={{ background: 'var(--surface)', borderRadius: 10, padding: 16, marginBottom: 12, border: `1px solid ${r.gain < 0 ? '#EF4444' : '#22C55E'}30` }}>
-              <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr 1fr 1fr auto', gap: 10, marginBottom: 10 }}>
+            <div key={e.id} style={{ background: 'var(--surface)', borderRadius: 10, padding: 16, marginBottom: 12, border: `1px solid ${r.gain < 0 ? 'var(--red)' : 'var(--green)'}30` }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: 10, marginBottom: 10 }}>
                 <div>
                   <div style={{ fontSize: 11, color: 'var(--muted)', marginBottom: 4 }}>Asset name</div>
                   <input style={S.inp} value={e.name} onChange={ev => upd(e.id, 'name', ev.target.value)} placeholder="e.g. Reliance, MF name" />
                 </div>
                 <div>
                   <div style={{ fontSize: 11, color: 'var(--muted)', marginBottom: 4 }}>Asset type</div>
-                  <select style={S.inp} value={e.asset} onChange={ev => upd(e.id, 'asset', ev.target.value)}>
+                  <select style={S.inp} value={e.asset} onChange={ev => upd(e.id, 'asset', ev.target.value as AssetType)}>
                     {Object.entries(ASSET_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
                   </select>
                 </div>
@@ -153,16 +155,18 @@ export default function CapitalGainsPage() {
                   <div style={{ fontSize: 11, color: 'var(--muted)', marginBottom: 4 }}>Sell date</div>
                   <input style={S.inp} type="date" value={e.sellDate} onChange={ev => upd(e.id, 'sellDate', ev.target.value)} />
                 </div>
-                <button onClick={() => del(e.id)} style={{ background: 'none', border: 'none', color: 'var(--red)', cursor: 'pointer', fontSize: 20, alignSelf: 'flex-end', paddingBottom: 4 }}>×</button>
+                <div style={{ display: 'flex', alignItems: 'flex-end' }}>
+                  <button className="pressable" onClick={() => del(e.id)} aria-label="Delete transaction" style={{ background: 'none', border: 'none', color: 'var(--red)', cursor: 'pointer', fontSize: 20, paddingBottom: 6 }}>×</button>
+                </div>
               </div>
 
               {(e.buy && e.sell) && (
                 <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap', fontSize: 13 }}>
                   <span>Holding: <b>{r.months} months</b></span>
-                  <span style={{ color: r.isLT ? '#22C55E' : '#F59E0B' }}>{r.isLT ? '✅ Long term' : '⚡ Short term'}</span>
-                  <span>Gain: <b style={{ color: r.gain >= 0 ? '#22C55E' : '#EF4444' }}>{inr(r.gain)}</b></span>
+                  <span style={{ color: r.isLT ? 'var(--green)' : 'var(--amber)' }}>{r.isLT ? '✅ Long term' : '⚡ Short term'}</span>
+                  <span>Gain: <b style={{ color: r.gain >= 0 ? 'var(--green)' : 'var(--red)' }}>{inr(r.gain)}</b></span>
                   <span>Tax type: <b>{r.label}</b></span>
-                  <span>Est. tax: <b style={{ color: '#EF4444' }}>{inr(r.tax)}</b></span>
+                  <span>Est. tax: <b style={{ color: 'var(--red)' }}>{inr(r.tax)}</b></span>
                 </div>
               )}
             </div>

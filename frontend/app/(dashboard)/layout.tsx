@@ -15,9 +15,9 @@ export default async function DashboardLayout({ children }: { children: React.Re
   } catch { /* guest */ }
 
   return (
-    <div style={{ display:'flex', minHeight:'100vh' }}>
+    <div className="dashboard-container">
       <Sidebar userName={name} userEmail={email} />
-      <main style={{ flex:1, marginLeft:220, display:'flex', flexDirection:'column', minHeight:'100vh' }}>
+      <main className="dashboard-main">
         {children}
       </main>
     </div>

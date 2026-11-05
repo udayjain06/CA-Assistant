@@ -31,20 +31,28 @@ export default function SaveFilingButton({ income, regime, taxAmount, taxSavings
   }
 
   if (status === 'saved') return (
-    <div style={{ display:'inline-flex', alignItems:'center', gap:8, padding:'10px 20px', borderRadius:8, background:'#052713', border:'1px solid #0a4020', fontSize:14, color:'#22C55E', fontWeight:500 }}>
+    <div
+      role="status"
+      style={{ display:'inline-flex', alignItems:'center', gap:8, padding:'10px 20px', borderRadius:8, background:'#052713', border:'1px solid #0a4020', fontSize:14, color:'var(--green)', fontWeight:500 }}
+    >
       ✅ Filing saved! Dashboard pe dikh jayega
     </div>
   )
 
   return (
-    <button onClick={save} disabled={status==='saving'} style={{
-      background: status==='error' ? '#1a0505' : 'var(--accent)',
-      color: status==='error' ? '#EF4444' : '#fff',
-      border:'none', borderRadius:8, padding:'10px 20px',
-      fontSize:14, fontWeight:500, cursor:'pointer',
-      opacity: status==='saving' ? 0.7 : 1
-    }}>
-      {status==='saving' ? '💾 Saving...' : status==='error' ? '❌ Error — retry' : '💾 Save to dashboard'}
+    <button
+      onClick={save}
+      disabled={status==='saving'}
+      className="pressable"
+      style={{
+        background: status==='error' ? '#1a0505' : 'var(--accent)',
+        color: status==='error' ? 'var(--red)' : '#fff',
+        border:'none', borderRadius:8, padding:'10px 20px',
+        fontSize:14, fontWeight:500, cursor:'pointer',
+        opacity: status==='saving' ? 0.7 : 1,
+      }}
+    >
+      {status==='saving' ? '💾 Saving…' : status==='error' ? '❌ Error — retry' : '💾 Save to dashboard'}
     </button>
   )
 }

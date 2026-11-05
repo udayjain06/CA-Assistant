@@ -58,14 +58,15 @@ export default function InvoicePage() {
   }
 
   if (preview) return (
-    <div style={{ padding: 28 }}>
-      <div style={{ display: 'flex', gap: 10, marginBottom: 20 }}>
-        <button style={S.ghost} onClick={() => setPreview(false)}>← Edit</button>
-        <button style={S.btn} onClick={() => window.print()}>🖨️ Print / Download PDF</button>
+    <div className="page-container">
+      <div style={{ display: 'flex', gap: 10, marginBottom: 20, flexWrap: 'wrap' }}>
+        <button className="pressable" style={S.ghost} onClick={() => setPreview(false)}>← Edit</button>
+        <button className="pressable" style={S.btn} onClick={() => window.print()}>🖨️ Print / Download PDF</button>
       </div>
 
-      {/* INVOICE */}
-      <div id="invoice" style={{ background: '#fff', color: '#111', borderRadius: 12, padding: 40, maxWidth: 800, fontFamily: 'Arial, sans-serif', fontSize: 13 }}>
+      {/* INVOICE WRAPPER FOR HORIZONTAL SCROLL ON PHONE */}
+      <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch', paddingBottom: 16 }}>
+        <div id="invoice" style={{ background: '#fff', color: '#111', borderRadius: 12, padding: 32, maxWidth: 800, minWidth: 640, fontFamily: 'Arial, sans-serif', fontSize: 13 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 24 }}>
           <div>
             <div style={{ fontSize: 24, fontWeight: 700, color: '#1a1a1a' }}>{seller.name || 'Your Business'}</div>
@@ -139,22 +140,23 @@ export default function InvoicePage() {
 
         {notes && <div style={{ marginTop: 12, fontSize: 12, color: '#555' }}><b>Notes:</b> {notes}</div>}
 
-        <div style={{ marginTop: 24, borderTop: '1px solid #eee', paddingTop: 16, display: 'flex', justifyContent: 'space-between', fontSize: 12, color: '#888' }}>
+        <div style={{ marginTop: 24, borderTop: '1px solid #eee', paddingTop: 16, display: 'flex', justifyContent: 'space-between', fontSize: 12, color: '#888', flexWrap: 'wrap', gap: 8 }}>
           <div>This is a computer generated invoice</div>
           <div>Seller State: {seller.state} | Buyer State: {buyer.state} | Supply type: {isInterState ? 'Inter-state (IGST)' : 'Intra-state (CGST+SGST)'}</div>
         </div>
+      </div>
       </div>
     </div>
   )
 
   return (
-    <div style={{ padding: 28 }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-        <h1 style={{ fontSize: 22, fontWeight: 600 }}>GST Invoice Generator</h1>
-        <button style={S.btn} onClick={() => setPreview(true)}>👁 Preview Invoice</button>
+    <div className="page-container">
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24, flexWrap: 'wrap', gap: 12 }}>
+        <h1 style={{ marginBottom: 0 }}>GST Invoice Generator</h1>
+        <button className="pressable" style={S.btn} onClick={() => setPreview(true)}>👁 Preview Invoice</button>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16, marginBottom: 16 }}>
         {/* Seller */}
         <div style={S.card}>
           <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 14 }}>🏢 Your business (Seller)</div>
@@ -216,35 +218,41 @@ export default function InvoicePage() {
 
       {/* Items */}
       <div style={S.card}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 14 }}>
-          <div style={{ fontSize: 14, fontWeight: 600 }}>Items / Services</div>
-          <button style={S.ghost} onClick={addItem}>+ Add item</button>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
+          <div style={{ fontSize: 14, fontWeight: 600, letterSpacing: '-0.01em' }}>Items / Services</div>
+          <button className="pressable" style={S.ghost} onClick={addItem}>+ Add item</button>
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: '3fr 1fr 1fr 1fr 1fr auto', gap: 8, marginBottom: 8 }}>
-          {['Description', 'HSN code', 'Qty', 'Rate (₹)', 'GST %', ''].map(h => (
-            <div key={h} style={{ fontSize: 11, color: 'var(--muted)', textTransform: 'uppercase' }}>{h}</div>
-          ))}
-        </div>
-        {items.map(item => {
-          const c = calcItem(item)
-          return (
-            <div key={item.id}>
-              <div style={{ display: 'grid', gridTemplateColumns: '3fr 1fr 1fr 1fr 1fr auto', gap: 8, marginBottom: 6 }}>
-                <input style={S.inp} value={item.desc} onChange={e => updItem(item.id, 'desc', e.target.value)} placeholder="Service/product description" />
-                <input style={S.inp} value={item.hsn} onChange={e => updItem(item.id, 'hsn', e.target.value)} placeholder="998313" />
-                <input style={S.inp} type="number" value={item.qty} onChange={e => updItem(item.id, 'qty', e.target.value)} />
-                <input style={S.inp} type="number" value={item.rate} onChange={e => updItem(item.id, 'rate', e.target.value)} placeholder="10000" />
-                <select style={S.inp} value={item.gst} onChange={e => updItem(item.id, 'gst', e.target.value)}>
-                  {['0', '5', '12', '18', '28'].map(r => <option key={r} value={r}>{r}%</option>)}
-                </select>
-                <button onClick={() => delItem(item.id)} style={{ background: 'none', border: 'none', color: 'var(--red)', cursor: 'pointer', fontSize: 18 }}>×</button>
-              </div>
-              {item.rate && <div style={{ fontSize: 12, color: 'var(--muted)', marginBottom: 8, paddingLeft: 4 }}>
-                Taxable: {inr(c.taxable)} | GST: {inr(c.gstAmt)} | Total: <b style={{ color: 'var(--text)' }}>{inr(c.total)}</b>
-              </div>}
+        <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch', paddingBottom: 8 }}>
+          <div style={{ minWidth: 520 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '3fr 1fr 1fr 1fr 1fr auto', gap: 8, marginBottom: 8 }}>
+              {['Description', 'HSN code', 'Qty', 'Rate (₹)', 'GST %', ''].map(h => (
+                <div key={h} style={{ fontSize: 11, color: 'var(--muted)', textTransform: 'uppercase' }}>{h}</div>
+              ))}
             </div>
-          )
-        })}
+            {items.map(item => {
+              const c = calcItem(item)
+              return (
+                <div key={item.id}>
+                  <div style={{ display: 'grid', gridTemplateColumns: '3fr 1fr 1fr 1fr 1fr auto', gap: 8, marginBottom: 6 }}>
+                    <input style={S.inp} value={item.desc} onChange={e => updItem(item.id, 'desc', e.target.value)} placeholder="Service/product description" />
+                    <input style={S.inp} value={item.hsn} onChange={e => updItem(item.id, 'hsn', e.target.value)} placeholder="998313" />
+                    <input style={S.inp} type="number" value={item.qty} onChange={e => updItem(item.id, 'qty', e.target.value)} />
+                    <input style={S.inp} type="number" value={item.rate} onChange={e => updItem(item.id, 'rate', e.target.value)} placeholder="10000" />
+                    <select style={S.inp} value={item.gst} onChange={e => updItem(item.id, 'gst', e.target.value)}>
+                      {['0', '5', '12', '18', '28'].map(r => <option key={r} value={r}>{r}%</option>)}
+                    </select>
+                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                      <button className="pressable" onClick={() => delItem(item.id)} aria-label="Delete item" style={{ background: 'none', border: 'none', color: 'var(--red)', cursor: 'pointer', fontSize: 18, padding: 6 }}>×</button>
+                    </div>
+                  </div>
+                  {item.rate && <div style={{ fontSize: 12, color: 'var(--muted)', marginBottom: 8, paddingLeft: 4 }}>
+                    Taxable: {inr(c.taxable)} | GST: {inr(c.gstAmt)} | Total: <b style={{ color: 'var(--text)' }}>{inr(c.total)}</b>
+                  </div>}
+                </div>
+              )
+            })}
+          </div>
+        </div>
         <div style={{ borderTop: '1px solid var(--border)', paddingTop: 14, display: 'flex', justifyContent: 'flex-end' }}>
           <div style={{ fontSize: 14 }}>
             Taxable: {inr(totalTaxable)} | GST: {inr(totalGST)} | <b style={{ color: 'var(--accent)', fontSize: 16 }}>Total: {inr(grandTotal)}</b>
@@ -258,7 +266,7 @@ export default function InvoicePage() {
           style={{ ...S.inp, minHeight: 80, resize: 'vertical', fontFamily: 'inherit' }} />
       </div>
 
-      <button style={{ ...S.btn, marginTop: 16 }} onClick={() => setPreview(true)}>👁 Preview & Print Invoice →</button>
+      <button className="pressable" style={{ ...S.btn, marginTop: 16 }} onClick={() => setPreview(true)}>👁 Preview & Print Invoice →</button>
     </div>
   )
 }

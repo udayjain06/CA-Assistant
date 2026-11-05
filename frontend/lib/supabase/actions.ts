@@ -58,6 +58,7 @@ export async function deleteFiling(filingId: string) {
     return { error: 'Delete failed' }
   }
 }
+export const deleteFilingAction = deleteFiling
 
 // ── Delete all user data (account wipe) ───────────────────────────────────────
 export async function deleteAllMyData() {
@@ -81,6 +82,8 @@ export async function deleteAllMyData() {
     return { error: 'Delete failed' }
   }
 }
+export const deleteAllUserData = deleteAllMyData
+export const deleteAccountAction = deleteAllMyData
 
 // ── Get dashboard stats ────────────────────────────────────────────────────────
 export async function getDashboardStats() {

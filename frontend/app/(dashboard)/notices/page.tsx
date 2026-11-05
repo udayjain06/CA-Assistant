@@ -1,7 +1,7 @@
 'use client'
 import { useState } from 'react'
 
-const API = 'process.env.NEXT_PUBLIC_API_URL!'
+const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
 
 const NOTICES = [
   {
@@ -119,10 +119,10 @@ Include: Subject line, proper salutation, body explaining position, closing.`
   }
 
   if (selected) return (
-    <div style={{ padding: 28 }}>
-      <button style={{ ...S.ghost, marginBottom: 20 }} onClick={() => { setSelected(null); setAiResponse('') }}>← Back to notices</button>
+    <div className="page-container">
+      <button className="pressable" style={{ ...S.ghost, marginBottom: 20 }} onClick={() => { setSelected(null); setAiResponse('') }}>← Back to notices</button>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 20 }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           {/* Notice explanation */}
           <div style={S.card}>
@@ -157,7 +157,7 @@ Include: Subject line, proper salutation, body explaining position, closing.`
               ))}
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: 10 }}>
               <div style={{ background: '#1f1500', border: '1px solid #3d2a00', borderRadius: 8, padding: 12 }}>
                 <div style={{ fontSize: 11, color: '#F59E0B', fontWeight: 600, marginBottom: 4 }}>⏰ DEADLINE</div>
                 <div style={{ fontSize: 13 }}>{selected.deadline}</div>
@@ -180,7 +180,7 @@ Include: Subject line, proper salutation, body explaining position, closing.`
                 placeholder="e.g. Meri income sahi thi, documents mere paas hain. Ya: Mujhe extend chahiye deadline."
                 style={{ ...S.inp, minHeight: 80, resize: 'vertical', fontFamily: 'inherit', fontSize: 13 }} />
             </div>
-            <button style={{ ...S.btn, opacity: loading ? 0.6 : 1 }} disabled={loading} onClick={getDraftResponse}>
+            <button className="pressable" style={{ ...S.btn, opacity: loading ? 0.6 : 1 }} disabled={loading} onClick={getDraftResponse}>
               {loading ? '🤖 Draft ban raha hai...' : '✍️ Draft response letter'}
             </button>
 
@@ -188,7 +188,7 @@ Include: Subject line, proper salutation, body explaining position, closing.`
               <div style={{ marginTop: 16 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
                   <div style={{ fontSize: 13, fontWeight: 600 }}>Draft letter:</div>
-                  <button style={S.ghost} onClick={() => navigator.clipboard.writeText(aiResponse)}>📋 Copy</button>
+                  <button className="pressable" style={S.ghost} onClick={() => navigator.clipboard.writeText(aiResponse)}>📋 Copy</button>
                 </div>
                 <div style={{ background: 'var(--surface)', borderRadius: 8, padding: 16, fontSize: 13, lineHeight: 1.8, whiteSpace: 'pre-wrap', fontFamily: 'monospace', maxHeight: 400, overflow: 'auto' }}>
                   {aiResponse}
@@ -217,13 +217,13 @@ Include: Subject line, proper salutation, body explaining position, closing.`
   )
 
   return (
-    <div style={{ padding: 28 }}>
-      <h1 style={{ fontSize: 22, fontWeight: 600, marginBottom: 8 }}>IT Notice Handler</h1>
+    <div className="page-container">
+      <h1 style={{ marginBottom: 8 }}>IT Notice Handler</h1>
       <p style={{ fontSize: 14, color: 'var(--muted)', marginBottom: 24 }}>Apna notice select karo — simple Hindi mein samjhayenge aur response draft karenge</p>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: 14 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 14 }}>
         {NOTICES.map(n => (
-          <button key={n.code} onClick={() => setSelected(n)} style={{
+          <button key={n.code} onClick={() => setSelected(n)} className="module-card pressable" style={{
             background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 12,
             padding: 20, cursor: 'pointer', textAlign: 'left' as const, transition: 'border-color .15s'
           }}>

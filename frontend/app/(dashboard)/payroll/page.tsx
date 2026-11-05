@@ -48,17 +48,17 @@ export default function PayrollPage() {
     const calc = calcSlip(slip)
     return (
       <div style={{padding:28}}>
-        <button style={{...S.ghost,marginBottom:20}} onClick={()=>setSlip(null)}>← Back</button>
+        <button className="pressable" style={{...S.ghost,marginBottom:20}} onClick={()=>setSlip(null)}>← Back</button>
         <div style={{...S.card,maxWidth:480}}>
           <div style={{textAlign:'center',borderBottom:'2px dashed var(--border)',paddingBottom:16,marginBottom:16}}>
-            <div style={{fontSize:18,fontWeight:700}}>{company}</div>
+            <div style={{fontSize:18,fontWeight:700,letterSpacing:'-0.015em'}}>{company}</div>
             <div style={{fontSize:13,color:'var(--muted)'}}>Salary Slip — {month}</div>
           </div>
           <div style={{marginBottom:16}}>
             <div style={{fontSize:14,fontWeight:600}}>{slip.name}</div>
             {slip.pan && <div style={{fontSize:12,color:'var(--muted)'}}>PAN: {slip.pan}</div>}
           </div>
-          <div style={{fontSize:12,fontWeight:600,color:'#22C55E',marginBottom:8,textTransform:'uppercase'}}>Earnings</div>
+          <div style={{fontSize:12,fontWeight:600,color:'var(--green)',marginBottom:8,textTransform:'uppercase',letterSpacing:'0.04em'}}>Earnings</div>
           {[['Basic Salary',slip.basic],['HRA',slip.hra],['Special Allowance',slip.special]].map(([l,v])=>(
             <div key={l as string} style={{display:'flex',justifyContent:'space-between',padding:'5px 0',borderBottom:'1px solid var(--border)'}}>
               <span style={{fontSize:13,color:'var(--muted)'}}>{l}</span>
@@ -66,9 +66,9 @@ export default function PayrollPage() {
             </div>
           ))}
           <div style={{display:'flex',justifyContent:'space-between',padding:'8px 0',borderBottom:'2px solid var(--border)',fontWeight:600}}>
-            <span>Gross Salary</span><span style={{color:'#22C55E'}}>{inr(calc.gross)}</span>
+            <span>Gross Salary</span><span style={{color:'var(--green)'}}>{inr(calc.gross)}</span>
           </div>
-          <div style={{fontSize:12,fontWeight:600,color:'#EF4444',margin:'12px 0 8px',textTransform:'uppercase'}}>Deductions</div>
+          <div style={{fontSize:12,fontWeight:600,color:'var(--red)',margin:'12px 0 8px',textTransform:'uppercase',letterSpacing:'0.04em'}}>Deductions</div>
           {[['PF (Employee 12%)',calc.pf_emp],['Professional Tax',calc.pt],['TDS (estimated)',calc.tds_monthly]].map(([l,v])=>(
             <div key={l as string} style={{display:'flex',justifyContent:'space-between',padding:'5px 0',borderBottom:'1px solid var(--border)'}}>
               <span style={{fontSize:13,color:'var(--muted)'}}>{l}</span>
@@ -76,21 +76,21 @@ export default function PayrollPage() {
             </div>
           ))}
           <div style={{display:'flex',justifyContent:'space-between',padding:'12px',marginTop:12,background:'rgba(34,197,94,.1)',borderRadius:8,fontSize:16,fontWeight:700}}>
-            <span>Net Take Home</span><span style={{color:'#22C55E'}}>{inr(calc.net)}</span>
+            <span>Net Take Home</span><span style={{color:'var(--green)'}}>{inr(calc.net)}</span>
           </div>
           <div style={{fontSize:12,color:'var(--muted)',marginTop:12,textAlign:'center'}}>
             Annual CTC: {inr(calc.gross*12)} | Annual TDS: {inr(calc.tds_monthly*12)}
           </div>
-          <button style={{...S.btn,width:'100%',marginTop:16}} onClick={()=>window.print()}>🖨️ Print Salary Slip</button>
+          <button className="pressable" style={{...S.btn,width:'100%',marginTop:16}} onClick={()=>window.print()}>🖨️ Print Salary Slip</button>
         </div>
       </div>
     )
   }
 
   return (
-    <div style={{padding:28}}>
-      <h1 style={{fontSize:22,fontWeight:600,marginBottom:24}}>Payroll & Form 16</h1>
-      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:16,marginBottom:20,maxWidth:500}}>
+    <div className="page-container">
+      <h1 style={{marginBottom:24}}>Payroll & Form 16</h1>
+      <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit, minmax(200px, 1fr))',gap:16,marginBottom:20,maxWidth:500}}>
         <div>
           <label style={{fontSize:13,color:'var(--muted)',display:'block',marginBottom:6}}>Company name</label>
           <input style={S.inp} value={company} onChange={e=>setCompany(e.target.value)}/>
@@ -102,9 +102,9 @@ export default function PayrollPage() {
       </div>
 
       <div style={S.card}>
-        <div style={{display:'flex',justifyContent:'space-between',marginBottom:16}}>
-          <div style={{fontSize:15,fontWeight:600}}>Employees ({emps.length})</div>
-          <button style={S.ghost} onClick={add}>+ Add employee</button>
+        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:16}}>
+          <div style={{fontSize:15,fontWeight:600,letterSpacing:'-0.01em'}}>Employees ({emps.length})</div>
+          <button className="pressable" style={S.ghost} onClick={add}>+ Add employee</button>
         </div>
 
         {emps.length===0 && (
@@ -118,7 +118,7 @@ export default function PayrollPage() {
           const c = calcSlip(emp)
           return (
             <div key={emp.id} style={{background:'var(--surface)',borderRadius:10,padding:16,marginBottom:12,border:'1px solid var(--border)'}}>
-              <div style={{display:'grid',gridTemplateColumns:'2fr 1fr 1fr 1fr 1fr 1fr',gap:10,marginBottom:10}}>
+              <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit, minmax(130px, 1fr))',gap:10,marginBottom:10}}>
                 <div>
                   <label style={{fontSize:11,color:'var(--muted)',display:'block',marginBottom:4}}>Name</label>
                   <input style={S.inp} value={emp.name} onChange={e=>upd(emp.id,'name',e.target.value)} placeholder="Employee name"/>
@@ -140,7 +140,7 @@ export default function PayrollPage() {
                   <input style={S.inp} value={emp.pan} onChange={e=>upd(emp.id,'pan',e.target.value.toUpperCase())} placeholder="ABCDE1234F"/>
                 </div>
                 <div style={{display:'flex',alignItems:'flex-end'}}>
-                  <button onClick={()=>del(emp.id)} style={{background:'none',border:'none',color:'var(--red)',cursor:'pointer',fontSize:20}}>×</button>
+                  <button className="pressable" onClick={()=>del(emp.id)} aria-label="Delete employee" style={{background:'none',border:'none',color:'var(--red)',cursor:'pointer',fontSize:20,paddingBottom:4}}>×</button>
                 </div>
               </div>
               {emp.basic>0 && (
@@ -148,8 +148,8 @@ export default function PayrollPage() {
                   <span style={{fontSize:12,color:'var(--muted)'}}>Gross: <b style={{color:'var(--text)'}}>{inr(c.gross)}</b></span>
                   <span style={{fontSize:12,color:'var(--muted)'}}>PF: <b style={{color:'var(--text)'}}>{inr(c.pf_emp)}</b></span>
                   <span style={{fontSize:12,color:'var(--muted)'}}>TDS: <b style={{color:'var(--text)'}}>{inr(c.tds_monthly)}</b></span>
-                  <span style={{fontSize:12,color:'#22C55E',fontWeight:600}}>Net: {inr(c.net)}</span>
-                  <button style={{...S.ghost,fontSize:12,padding:'4px 12px',marginLeft:'auto'}} onClick={()=>setSlip(emp)}>
+                  <span style={{fontSize:12,color:'var(--green)',fontWeight:600}}>Net: {inr(c.net)}</span>
+                  <button className="pressable" style={{...S.ghost,fontSize:12,padding:'4px 12px',marginLeft:'auto'}} onClick={()=>setSlip(emp)}>
                     📄 View Slip
                   </button>
                 </div>

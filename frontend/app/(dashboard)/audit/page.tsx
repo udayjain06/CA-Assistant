@@ -1,7 +1,7 @@
 'use client'
 import { useState } from 'react'
 
-const API = 'process.env.NEXT_PUBLIC_API_URL!'
+const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
 
 const COMPLIANCE_CHECKS = [
   { id:'itr', label:'ITR filed for AY 2025-26?', category:'Income Tax' },
@@ -55,29 +55,29 @@ export default function AuditPage() {
   }
 
   return (
-    <div style={{padding:28}}>
-      <h1 style={{fontSize:22,fontWeight:600,marginBottom:24}}>Audit & Advisory</h1>
+    <div className="page-container">
+      <h1 style={{marginBottom:24}}>Audit & Advisory</h1>
 
-      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:20}}>
+      <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit, minmax(280px, 1fr))',gap:20}}>
 
         {/* Compliance checker */}
         <div style={S.card}>
           <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:16}}>
-            <div style={{fontSize:15,fontWeight:600}}>Compliance Checker</div>
+            <div style={{fontSize:15,fontWeight:600,letterSpacing:'-0.01em'}}>Compliance Checker</div>
             {scanned && (
-              <div style={{fontSize:13,fontWeight:600,color:score>=80?'#22C55E':score>=50?'#F59E0B':'#EF4444'}}>
+              <div style={{fontSize:13,fontWeight:600,color:score>=80?'var(--green)':score>=50?'var(--amber)':'var(--red)'}}>
                 Score: {score}%
               </div>
             )}
           </div>
 
           {scanned && (
-            <div style={{
+            <div role="status" style={{
               marginBottom:16, padding:'12px 16px', borderRadius:10,
               background:score>=80?'#052713':score>=50?'#1f1500':'#1a0505',
               border:`1px solid ${score>=80?'#0a4020':score>=50?'#3d2a00':'#3d1010'}`
             }}>
-              <div style={{fontSize:14,fontWeight:600,color:score>=80?'#22C55E':score>=50?'#F59E0B':'#EF4444',marginBottom:4}}>
+              <div style={{fontSize:14,fontWeight:600,color:score>=80?'var(--green)':score>=50?'var(--amber)':'var(--red)',marginBottom:4}}>
                 {score>=80?'✅ Compliance sahi hai!':score>=50?'⚠️ Kuch cheezein pending hain':'🚨 Compliance issues hain — fix karo!'}
               </div>
               <div style={{fontSize:13,color:'var(--muted)'}}>
@@ -93,7 +93,7 @@ export default function AuditPage() {
                 <div style={{fontSize:13,marginBottom:8}}>{c.label}</div>
                 <div style={{display:'flex',gap:6}}>
                   {(['yes','no','na'] as CheckStatus[]).map(s=>(
-                    <button key={s} onClick={()=>setChecks(p=>({...p,[c.id]:s}))} style={{
+                    <button key={s} onClick={()=>setChecks(p=>({...p,[c.id]:s}))} className="pressable" style={{
                       padding:'3px 12px',borderRadius:6,fontSize:12,fontWeight:500,cursor:'pointer',border:'none',
                       background:checks[c.id]===s?statusBg(s):'var(--card)',
                       color:checks[c.id]===s?statusColor(s):'var(--muted)',
@@ -104,7 +104,7 @@ export default function AuditPage() {
               </div>
             ))}
           </div>
-          <button style={{...S.btn,width:'100%',marginTop:16}} onClick={()=>setScanned(true)}>
+          <button className="pressable" style={{...S.btn,width:'100%',marginTop:16}} onClick={()=>setScanned(true)}>
             🔍 Check Compliance Score
           </button>
         </div>
@@ -112,19 +112,19 @@ export default function AuditPage() {
         {/* AI Advisory */}
         <div style={{display:'flex',flexDirection:'column',gap:16}}>
           <div style={S.card}>
-            <div style={{fontSize:15,fontWeight:600,marginBottom:16}}>🤖 AI Compliance Advisor</div>
-            <div style={{display:'flex',gap:10,marginBottom:12}}>
-              <input style={S.inp} value={question} onChange={e=>setQuestion(e.target.value)}
+            <div style={{fontSize:15,fontWeight:600,marginBottom:16,letterSpacing:'-0.01em'}}>🤖 AI Compliance Advisor</div>
+            <div style={{display:'flex',gap:10,marginBottom:12,flexWrap:'wrap'}}>
+              <input style={{...S.inp,minWidth:200}} value={question} onChange={e=>setQuestion(e.target.value)}
                 onKeyDown={e=>e.key==='Enter'&&askAudit()}
                 placeholder="Koi bhi compliance sawaal poochho..."/>
-              <button style={{...S.btn,opacity:loading?.6:1}} disabled={loading} onClick={askAudit}>
-                {loading?'...':'Ask'}
+              <button className="pressable" style={{...S.btn,opacity:loading?.6:1}} disabled={loading} onClick={askAudit}>
+                {loading?'…':'Ask'}
               </button>
             </div>
             {/* Quick questions */}
             <div style={{display:'flex',flexWrap:'wrap',gap:6,marginBottom:12}}>
               {['GST late fee kitni hogi?','TDS nahi diya toh kya hoga?','Tax audit kab mandatory hai?','Penalty se kaise bacho?'].map(q=>(
-                <button key={q} onClick={()=>setQuestion(q)} style={{
+                <button key={q} onClick={()=>setQuestion(q)} className="pressable" style={{
                   padding:'4px 10px',borderRadius:16,fontSize:12,cursor:'pointer',
                   background:'var(--surface)',border:'1px solid var(--border)',color:'var(--muted)'
                 }}>{q}</button>

@@ -47,6 +47,7 @@ export default function ITRPage() {
   const [advice, setAdvice] = useState('')
   const [loading, setLoading] = useState(false)
   const [saveStatus, setSaveStatus] = useState<'idle'|'saving'|'saved'|'error'>('idle')
+  const [incomeError, setIncomeError] = useState('')
 
   const inc = Number(income)||0
   const ag  = Number(age)||28
@@ -54,7 +55,8 @@ export default function ITRPage() {
   const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
 
   function compare() {
-    if (!income) { alert('Pehle income daalo!'); return }
+    if (!income) { setIncomeError('Income daalo pehle!'); return }
+    setIncomeError('')
     const oldR = calcTax(inc,'old',ag,dedNums)
     const newR = calcTax(inc,'new',ag,dedNums)
     const rec  = oldR.tax < newR.tax ? 'old' : 'new'
@@ -106,18 +108,18 @@ export default function ITRPage() {
   const steps = ['Basic details','Deductions','Tax comparison','AI advice']
 
   return (
-    <div style={{ padding:28 }}>
-      <h1 style={{ fontSize:22, fontWeight:600, marginBottom:24 }}>ITR Filing</h1>
+    <div className="page-container">
+      <h1 style={{ marginBottom:20 }}>ITR Filing</h1>
 
       {/* Stepper */}
-      <div style={{ display:'flex', marginBottom:28, maxWidth:760 }}>
+      <div className="scrollable-tabs" style={{ display:'flex', marginBottom:24, maxWidth:760, borderBottom:'1px solid var(--border)' }}>
         {steps.map((s,i) => {
           const n=(i+1) as Step
           const state = n<step?'done':n===step?'active':'idle'
           return (
-            <div key={s} style={{ flex:1, padding:'12px 8px', fontSize:13, fontWeight:500,
+            <div key={s} style={{ flex:'1 0 auto', minWidth:130, padding:'12px 10px', fontSize:13, fontWeight:500,
               color:state==='active'?'var(--accent)':state==='done'?'#22C55E':'var(--muted)',
-              borderBottom:`2px solid ${state==='active'?'var(--accent)':state==='done'?'#22C55E':'var(--border)'}`}}>
+              borderBottom:`2px solid ${state==='active'?'var(--accent)':state==='done'?'#22C55E':'transparent'}`}}>
               <span style={{ display:'inline-flex',alignItems:'center',justifyContent:'center',width:20,height:20,borderRadius:'50%',fontSize:11,marginRight:6,
                 background:state==='active'?'var(--accent)':state==='done'?'#22C55E':'var(--border2)',color:state==='idle'?'var(--muted)':'#fff'}}>
                 {state==='done'?'✓':n}
@@ -131,7 +133,7 @@ export default function ITRPage() {
       {step===1 && (
         <div style={S.card}>
           <h2 style={{ fontSize:16, fontWeight:600, marginBottom:16 }}>Basic details</h2>
-          <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:16, marginBottom:16 }}>
+          <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(220px, 1fr))', gap:16, marginBottom:16 }}>
             <div>
               <label style={{ fontSize:13, color:'var(--muted)', display:'block', marginBottom:6 }}>Gross annual income (₹)</label>
               <input style={S.inp} type="number" placeholder="e.g. 1200000" value={income} onChange={e=>setIncome(e.target.value)}/>
@@ -145,7 +147,7 @@ export default function ITRPage() {
             <label style={{ fontSize:13, color:'var(--muted)', display:'block', marginBottom:8 }}>Income sources</label>
             <div style={{ display:'flex', gap:8, flexWrap:'wrap' }}>
               {['salary','business','capital_gains','house_property','interest'].map(s=>(
-                <button key={s} type="button" onClick={()=>setSources(p=>p.includes(s)?p.filter(x=>x!==s):[...p,s])} style={{
+                <button key={s} type="button" onClick={()=>setSources(p=>p.includes(s)?p.filter(x=>x!==s):[...p,s])} className="pressable" style={{
                   padding:'6px 14px',borderRadius:20,fontSize:13,cursor:'pointer',border:'none',
                   background:sources.includes(s)?'rgba(79,110,247,.2)':'var(--surface)',
                   outline:`1px solid ${sources.includes(s)?'var(--accent)':'var(--border2)'}`,
@@ -159,7 +161,10 @@ export default function ITRPage() {
               📋 Recommended form: <strong>{sources.includes('business')?'ITR-3':sources.includes('capital_gains')?'ITR-2':inc>5000000?'ITR-2':'ITR-1 (Sahaj)'}</strong>
             </div>
           )}
-          <button style={S.btn} onClick={()=>{if(!income){alert('Income daalo pehle!');return}setStep(2)}}>Continue →</button>
+          {incomeError && (
+            <div role="alert" style={{ color:'var(--red)', fontSize:13, marginBottom:8, padding:'8px 12px', background:'#1a0505', borderRadius:7, border:'1px solid #3d1010' }}>{incomeError}</div>
+          )}
+          <button className="pressable" style={S.btn} onClick={()=>{ if(!income){ setIncomeError('Income daalo pehle!'); return } setIncomeError(''); setStep(2)}}>Continue →</button>
         </div>
       )}
 
@@ -168,7 +173,7 @@ export default function ITRPage() {
         <div style={S.card}>
           <h2 style={{ fontSize:16, fontWeight:600, marginBottom:4 }}>Deductions (old regime ke liye)</h2>
           <p style={{ fontSize:13, color:'var(--muted)', marginBottom:20 }}>Yaad na ho toh 0 likhna bilkul theek hai</p>
-          <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:16, marginBottom:20 }}>
+          <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(220px, 1fr))', gap:16, marginBottom:20 }}>
             {[
               {key:'sec80c', label:'80C — PF, LIC, ELSS (max ₹1.5L)'},
               {key:'sec80d', label:'80D — Health insurance (max ₹25K)'},
@@ -184,8 +189,8 @@ export default function ITRPage() {
             ))}
           </div>
           <div style={{ display:'flex', gap:10 }}>
-            <button style={S.ghost} onClick={()=>setStep(1)}>← Back</button>
-            <button style={S.btn} onClick={compare}>Compare regimes →</button>
+            <button className="pressable" style={S.ghost} onClick={()=>setStep(1)}>← Back</button>
+            <button className="pressable" style={S.btn} onClick={compare}>Compare regimes →</button>
           </div>
         </div>
       )}
@@ -193,7 +198,7 @@ export default function ITRPage() {
       {/* Step 3 */}
       {step===3 && result && (
         <div style={{ maxWidth:760, display:'flex', flexDirection:'column', gap:16 }}>
-          <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:16 }}>
+          <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(260px, 1fr))', gap:16 }}>
             {(['new','old'] as const).map(r=>(
               <div key={r} style={{ ...S.card, maxWidth:'100%', border:result.recommended===r?'2px solid var(--accent)':'1px solid var(--border)' }}>
                 {result.recommended===r && <div style={{ fontSize:12,fontWeight:600,color:'var(--accent)',marginBottom:10 }}>⭐ TUMHARE LIYE BEST</div>}
@@ -221,8 +226,8 @@ export default function ITRPage() {
             </div>
           </div>
           <div style={{ display:'flex', gap:10 }}>
-            <button style={S.ghost} onClick={()=>setStep(2)}>← Back</button>
-            <button style={{...S.btn,opacity:loading?0.6:1}} onClick={getAdvice} disabled={loading}>
+            <button className="pressable" style={S.ghost} onClick={()=>setStep(2)}>← Back</button>
+            <button className="pressable" style={{...S.btn,opacity:loading?0.6:1}} onClick={getAdvice} disabled={loading}>
               {loading?'🤖 AI soch raha hai...':'🤖 AI tax advice lo →'}
             </button>
           </div>
@@ -237,17 +242,17 @@ export default function ITRPage() {
             <div style={{ whiteSpace:'pre-wrap',fontSize:14,lineHeight:1.8,background:'var(--surface)',borderRadius:8,padding:16 }}>{advice}</div>
           </div>
           <div style={{ display:'flex', gap:10, flexWrap:'wrap' }}>
-            <button style={S.ghost} onClick={()=>setStep(3)}>← Back</button>
+            <button className="pressable" style={S.ghost} onClick={()=>setStep(3)}>← Back</button>
 
             {/* Save to dashboard button */}
             {saveStatus==='saved' ? (
-              <div style={{ display:'inline-flex',alignItems:'center',gap:8,padding:'10px 20px',borderRadius:8,background:'#052713',border:'1px solid #0a4020',fontSize:14,color:'#22C55E',fontWeight:500 }}>
+              <div style={{ display:'inline-flex',alignItems:'center',gap:8,padding:'10px 20px',borderRadius:8,background:'#052713',border:'1px solid #0a4020',fontSize:14,color:'var(--green)',fontWeight:500 }}>
                 ✅ Dashboard pe save ho gaya!
               </div>
             ) : (
-              <button onClick={handleSave} disabled={saveStatus==='saving'} style={{
+              <button className="pressable" onClick={handleSave} disabled={saveStatus==='saving'} style={{
                 background:saveStatus==='error'?'#1a0505':'#1D9E75',
-                color:saveStatus==='error'?'#EF4444':'#fff',
+                color:saveStatus==='error'?'var(--red)':'#fff',
                 border:'none',borderRadius:8,padding:'10px 20px',fontSize:14,fontWeight:500,cursor:'pointer',
                 opacity:saveStatus==='saving'?0.7:1
               }}>
@@ -255,7 +260,7 @@ export default function ITRPage() {
               </button>
             )}
 
-            <button style={S.btn} onClick={()=>{setStep(1);setResult(null);setAdvice('');setIncome('');setSaveStatus('idle')}}>
+            <button className="pressable" style={S.btn} onClick={()=>{setStep(1);setResult(null);setAdvice('');setIncome('');setSaveStatus('idle')}}>
               🔄 Naya calculation
             </button>
           </div>
